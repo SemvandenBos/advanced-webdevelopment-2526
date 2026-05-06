@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useHuishoudboekjes } from '@/hooks/useHuishoudboekjes';
 import { useAuth } from '@/contexts/AuthContext';
 import HuishoudboekjeCard from '@/components/HuishoudboekjeCard';
+import { BooksListSkeleton } from '@/components/skeletons/BookCardSkeleton';
 import { archiveHuishoudboekje } from '@/lib/firestore/huishoudboekjes';
 
 export default function BooksPage() {
@@ -31,7 +32,7 @@ export default function BooksPage() {
         </div>
       </div>
       {loading ? (
-        <p className="text-sm text-gray-400">Laden...</p>
+        <BooksListSkeleton />
       ) : books.length === 0 ? (
         <p className="text-gray-500 text-sm">Nog geen boekjes — voeg er een toe om te beginnen.</p>
       ) : (

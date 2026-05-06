@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useArchivedHuishoudboekjes } from '@/hooks/useHuishoudboekjes';
 import { useAuth } from '@/contexts/AuthContext';
 import HuishoudboekjeCard from '@/components/HuishoudboekjeCard';
+import { BooksListSkeleton } from '@/components/skeletons/BookCardSkeleton';
 import { restoreHuishoudboekje, deleteHuishoudboekje } from '@/lib/firestore/huishoudboekjes';
 
 export default function ArchivedBooksPage() {
@@ -28,7 +29,7 @@ export default function ArchivedBooksPage() {
         <h1 className="text-2xl font-bold text-gray-900">Gearchiveerde boekjes</h1>
       </div>
       {loading ? (
-        <p className="text-sm text-gray-400">Laden...</p>
+        <BooksListSkeleton />
       ) : books.length === 0 ? (
         <p className="text-gray-500 text-sm">Geen gearchiveerde boekjes.</p>
       ) : (
