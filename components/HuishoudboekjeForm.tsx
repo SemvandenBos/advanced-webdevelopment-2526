@@ -48,7 +48,7 @@ export default function HuishoudboekjeForm({
           type="text"
           value={name}
           onChange={e => setName(e.target.value)}
-          className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="bijv. Huishouden 2025"
           autoFocus
         />
@@ -60,7 +60,7 @@ export default function HuishoudboekjeForm({
         <textarea
           value={description}
           onChange={e => setDescription(e.target.value)}
-          className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+          className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
           placeholder="Optionele omschrijving"
           rows={3}
         />
