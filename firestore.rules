@@ -1,0 +1,43 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /huishoudboekjes/{bookId} {
+      function isMember() {
+        return request.auth != null &&
+          (resource.data.ownerUid == request.auth.uid ||
+           request.auth.uid in resource.data.members);
+      }
+
+      function isOwner() {
+        return request.auth != null &&
+          resource.data.ownerUid == request.auth.uid;
+      }
+
+      allow read: if isMember();
+      allow create: if request.auth != null;
+      allow update, delete: if isOwner();
+
+      match /transactions/{transactionId} {
+        function bookIsMember() {
+          let book = get(/databases/$(database)/documents/huishoudboekjes/$(bookId));
+          return request.auth != null &&
+            (book.data.ownerUid == request.auth.uid ||
+             request.auth.uid in book.data.members);
+        }
+
+        allow read, write: if bookIsMember();
+      }
+
+      match /categories/{categoryId} {
+        function bookIsMember() {
+          let book = get(/databases/$(database)/documents/huishoudboekjes/$(bookId));
+          return request.auth != null &&
+            (book.data.ownerUid == request.auth.uid ||
+             request.auth.uid in book.data.members);
+        }
+
+        allow read, write: if bookIsMember();
+      }
+    }
+  }
+}
