@@ -11,6 +11,7 @@ import {
   serverTimestamp,
   onSnapshot,
   arrayUnion,
+  arrayRemove,
   type Unsubscribe,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -120,5 +121,11 @@ export async function deleteHuishoudboekje(id: string): Promise<void> {
 export async function addMember(id: string, memberUid: string): Promise<void> {
   await updateDoc(doc(db, 'huishoudboekjes', id), {
     members: arrayUnion(memberUid),
+  });
+}
+
+export async function removeMember(id: string, memberUid: string): Promise<void> {
+  await updateDoc(doc(db, 'huishoudboekjes', id), {
+    members: arrayRemove(memberUid),
   });
 }

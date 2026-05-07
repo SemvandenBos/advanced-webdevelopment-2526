@@ -15,10 +15,13 @@ export default function BooksPage() {
     await archiveHuishoudboekje(id);
   };
 
+  const ownedBooks = books.filter(b => b.ownerUid === user?.uid);
+  const sharedBooks = books.filter(b => b.ownerUid !== user?.uid);
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Mijn huishoudboekjes</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Huishoudboekjes</h1>
         <div className="flex items-center gap-4">
           <Link href="/books/archived" className="text-sm text-gray-500 hover:underline">
             Gearchiveerd
@@ -33,20 +36,43 @@ export default function BooksPage() {
       </div>
       {loading ? (
         <BooksListSkeleton />
-      ) : books.length === 0 ? (
-        <p className="text-gray-500 text-sm">Nog geen boekjes — voeg er een toe om te beginnen.</p>
       ) : (
-        <ul className="space-y-3">
-          {books.map(book => (
-            <li key={book.id}>
-              <HuishoudboekjeCard
-                book={book}
-                isOwner={book.ownerUid === user?.uid}
-                onArchive={handleArchive}
-              />
-            </li>
-          ))}
-        </ul>
+        <>
+          <section className="mb-8">
+            <h2 className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">Mijn boekjes</h2>
+            {ownedBooks.length === 0 ? (
+              <p className="text-gray-500 text-sm">Nog geen boekjes — voeg er een toe om te beginnen.</p>
+            ) : (
+              <ul className="space-y-3">
+                {ownedBooks.map(book => (
+                  <li key={book.id}>
+                    <HuishoudboekjeCard
+                      book={book}
+                      isOwner={true}
+                      onArchive={handleArchive}
+                    />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+
+          {sharedBooks.length > 0 && (
+            <section>
+              <h2 className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">Gedeeld met mij</h2>
+              <ul className="space-y-3">
+                {sharedBooks.map(book => (
+                  <li key={book.id}>
+                    <HuishoudboekjeCard
+                      book={book}
+                      isOwner={false}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+        </>
       )}
     </div>
   );

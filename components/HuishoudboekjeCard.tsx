@@ -1,7 +1,10 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { Huishoudboekje } from '@/types';
+import { useAuth } from '@/contexts/AuthContext';
+import ShareModal from '@/components/ShareModal';
 
 interface Props {
   book: Huishoudboekje;
@@ -13,8 +16,11 @@ interface Props {
 
 export default function HuishoudboekjeCard({ book, isOwner, onArchive, onRestore, onDelete }: Props) {
   const isArchived = !!onRestore;
+  const [shareOpen, setShareOpen] = useState(false);
+  const { user } = useAuth();
 
   return (
+    <>
     <div className="bg-white border border-gray-200 rounded-lg p-5 flex items-start justify-between gap-4">
       <div className="min-w-0">
         {isArchived ? (
@@ -54,6 +60,14 @@ export default function HuishoudboekjeCard({ book, isOwner, onArchive, onRestore
         ) : (
           <>
             {isOwner && (
+              <button
+                onClick={() => setShareOpen(true)}
+                className="text-sm text-blue-500 hover:underline"
+              >
+                Delen
+              </button>
+            )}
+            {isOwner && (
               <Link
                 href={`/books/${book.id}/edit`}
                 className="text-sm text-gray-500 hover:underline"
@@ -73,5 +87,13 @@ export default function HuishoudboekjeCard({ book, isOwner, onArchive, onRestore
         )}
       </div>
     </div>
+    {shareOpen && user && (
+      <ShareModal
+        book={book}
+        currentUserUid={user.uid}
+        onClose={() => setShareOpen(false)}
+      />
+    )}
+    </>
   );
 }
