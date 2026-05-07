@@ -1,5 +1,12 @@
 import { Timestamp } from "firebase/firestore";
 
+export interface AppUser {
+  uid: string;
+  email: string;
+  displayName: string;
+  createdAt: Timestamp;
+}
+
 export interface Huishoudboekje {
   id: string;
   name: string;
