@@ -8,10 +8,12 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getHuishoudboekje } from '@/lib/firestore/huishoudboekjes';
 import { deleteTransaction } from '@/lib/firestore/transactions';
 import { useTransactions, useMonthlyChartData } from '@/hooks/useTransactions';
+import { useCategories, useCategorySpending } from '@/hooks/useCategories';
 import { Huishoudboekje } from '@/types';
 import MonthNav from '@/components/MonthNav';
 import MonthlySummary from '@/components/MonthlySummary';
 import TransactionRow from '@/components/TransactionRow';
+import CategoryCompact from '@/components/CategoryCompact';
 import { TransactionListSkeleton } from '@/components/skeletons/TransactionSkeleton';
 
 const MonthlyLineChart = dynamic(
@@ -33,6 +35,8 @@ export default function BookDetailPage() {
 
   const { transactions, loading: txLoading, summary } = useTransactions(id, year, month);
   const { data: chartData } = useMonthlyChartData(id);
+  const { categories } = useCategories(id);
+  const { spending } = useCategorySpending(id);
 
   useEffect(() => {
     getHuishoudboekje(id).then(data => {
@@ -101,19 +105,47 @@ export default function BookDetailPage() {
 
       <MonthlySummary {...summary} />
 
-      {txLoading ? (
-        <TransactionListSkeleton />
-      ) : transactions.length === 0 ? (
-        <p className="text-gray-500 text-sm">Geen transacties in deze maand.</p>
-      ) : (
-        <ul className="space-y-2">
-          {transactions.map(tx => (
-            <li key={tx.id}>
-              <TransactionRow transaction={tx} bookId={id} onDelete={handleDelete} />
-            </li>
-          ))}
-        </ul>
-      )}
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-start">
+        <div className="md:col-span-3 space-y-3">
+          <p className="text-sm font-semibold text-gray-700">In- en uitkomsten</p>
+          {txLoading ? (
+            <TransactionListSkeleton />
+          ) : transactions.length === 0 ? (
+            <p className="text-gray-500 text-sm">Geen transacties in deze maand.</p>
+          ) : (
+            <ul className="space-y-3 max-h-140 overflow-y-auto pr-1">
+              {transactions.map(tx => (
+                <li key={tx.id}>
+                  <TransactionRow transaction={tx} bookId={id} onDelete={handleDelete} />
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div className="md:col-span-2 md:sticky md:top-4 space-y-3">
+          <p className="text-sm font-semibold text-gray-700">Categorieën</p>
+          {categories.length === 0 ? (
+            <p className="text-xs text-gray-400">
+              Geen categorieën.{' '}
+              <Link href={`/books/${id}/categories`} className="underline hover:text-gray-600">
+                Voeg er een toe
+              </Link>
+              .
+            </p>
+          ) : (
+            <ul className="space-y-3 max-h-140 overflow-y-auto pr-1">
+              {categories.map(cat => (
+                <CategoryCompact
+                  key={cat.id}
+                  category={cat}
+                  spent={spending.get(cat.id) ?? 0}
+                />
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
 
       {chartData.some(m => m.income > 0 || m.expenses > 0) && (
         <div className="bg-white border border-gray-200 rounded-lg p-5">
