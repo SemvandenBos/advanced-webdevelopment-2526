@@ -5,11 +5,13 @@ import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import TransactionForm from '@/components/TransactionForm';
 import { createTransaction } from '@/lib/firestore/transactions';
+import { useCategories } from '@/hooks/useCategories';
 
 export default function NewTransactionPage() {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const router = useRouter();
+  const { categories } = useCategories(id);
 
   const handleSubmit = async (data: {
     amount: number;
@@ -29,7 +31,7 @@ export default function NewTransactionPage() {
         ← Terug
       </Link>
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Transactie toevoegen</h1>
-      <TransactionForm onSubmit={handleSubmit} submitLabel="Toevoegen" />
+      <TransactionForm onSubmit={handleSubmit} submitLabel="Toevoegen" categories={categories} />
     </div>
   );
 }

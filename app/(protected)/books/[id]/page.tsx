@@ -76,6 +76,9 @@ export default function BookDetailPage() {
               Bewerken
             </Link>
           )}
+          <Link href={`/books/${id}/categories`} className="text-sm text-gray-500 hover:underline">
+            Categorieën
+          </Link>
           <Link
             href={`/books/${id}/transactions/new`}
             className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"

@@ -2,12 +2,14 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Category } from '@/types';
 
 interface FormValues {
   amount: string;
   description: string;
   date: string;
   type: 'income' | 'expense';
+  categoryId: string;
 }
 
 interface SubmitData {
@@ -22,6 +24,7 @@ interface Props {
   initial?: Partial<FormValues>;
   onSubmit: (data: SubmitData) => Promise<void>;
   submitLabel: string;
+  categories?: Category[];
 }
 
 function todayISO() {
@@ -29,12 +32,13 @@ function todayISO() {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
-export default function TransactionForm({ initial, onSubmit, submitLabel }: Props) {
+export default function TransactionForm({ initial, onSubmit, submitLabel, categories }: Props) {
   const [form, setForm] = useState<FormValues>({
     amount: initial?.amount ?? '',
     description: initial?.description ?? '',
     date: initial?.date ?? todayISO(),
     type: initial?.type ?? 'expense',
+    categoryId: initial?.categoryId ?? '',
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -62,7 +66,7 @@ export default function TransactionForm({ initial, onSubmit, submitLabel }: Prop
         description: form.description.trim(),
         date: new Date(form.date),
         type: form.type,
-        categoryId: '',
+        categoryId: form.categoryId,
       });
     } catch {
       setError('Er is iets misgegaan. Probeer het opnieuw.');
@@ -129,6 +133,24 @@ export default function TransactionForm({ initial, onSubmit, submitLabel }: Prop
           placeholder="Optionele omschrijving"
         />
       </div>
+
+      {categories && categories.length > 0 && (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Categorie</label>
+          <select
+            value={form.categoryId}
+            onChange={e => set('categoryId', e.target.value)}
+            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Geen categorie</option>
+            {categories.map(cat => (
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">Datum</label>
