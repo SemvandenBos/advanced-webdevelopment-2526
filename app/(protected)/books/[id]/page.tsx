@@ -114,7 +114,7 @@ export default function BookDetailPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-start">
         <div className="md:col-span-3 space-y-3">
-          <p className="text-sm font-semibold text-gray-700">In- en uitkomsten</p>
+          <p className="text-sm font-semibold text-gray-700">Inkomsten en uitgaven</p>
           {txLoading ? (
             <TransactionListSkeleton />
           ) : transactions.length === 0 ? (
