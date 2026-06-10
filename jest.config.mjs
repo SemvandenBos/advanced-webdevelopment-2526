@@ -15,6 +15,10 @@ const config = {
     '!**/*.d.ts',
   ],
   coverageReporters: ['text', 'html', 'lcov'],
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/$1',
+  },
+  testPathIgnorePatterns: ['/node_modules/', '/.next/', '/__tests__/fixtures/'],
 }
 
 export default createJestConfig(config)
