@@ -3,15 +3,26 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 import { getTransaction, updateTransaction } from '@/lib/firestore/transactions';
+import { getHuishoudboekje } from '@/lib/firestore/huishoudboekjes';
 import TransactionForm from '@/components/TransactionForm';
 import { Transaction } from '@/types';
+import { useCategories } from '@/hooks/useCategories';
 
 export default function EditTransactionPage() {
   const { id, txId } = useParams<{ id: string; txId: string }>();
+  const { user } = useAuth();
   const router = useRouter();
   const [tx, setTx] = useState<Transaction | null>(null);
   const [loading, setLoading] = useState(true);
+  const { categories } = useCategories(id);
+
+  useEffect(() => {
+    getHuishoudboekje(id).then(book => {
+      if (!book || book.ownerUid !== user?.uid) router.replace(`/books/${id}`);
+    });
+  }, [id, user?.uid, router]);
 
   useEffect(() => {
     getTransaction(id, txId).then(data => {
@@ -51,9 +62,11 @@ export default function EditTransactionPage() {
           description: tx.description,
           date: dateISO,
           type: tx.type,
+          categoryId: tx.categoryId ?? '',
         }}
         onSubmit={handleSubmit}
         submitLabel="Opslaan"
+        categories={categories}
       />
     </div>
   );
