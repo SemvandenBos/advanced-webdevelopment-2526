@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 import { Timestamp } from 'firebase/firestore';
+import { useDraggable } from '@dnd-kit/core';
+import { CSS } from '@dnd-kit/utilities';
 import { Transaction } from '@/types';
 
 function fmt(n: number) {
@@ -22,8 +24,24 @@ interface Props {
 export default function TransactionRow({ transaction: tx, bookId, onDelete, isOwner }: Props) {
   const isIncome = tx.type === 'income';
 
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id: `tx-${tx.id}`,
+    data: { type: 'transaction', txId: tx.id },
+  });
+
+  const style = transform ? { transform: CSS.Transform.toString(transform) } : undefined;
+
   return (
-    <div className="bg-white border border-gray-200 rounded-lg px-5 py-3 flex items-center gap-4">
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className={[
+        'group bg-white border border-gray-200 rounded-lg px-5 py-3 flex items-center gap-4 cursor-grab active:cursor-grabbing select-none',
+        isDragging ? 'opacity-50 shadow-lg z-50' : '',
+      ].join(' ')}
+    >
       <span
         className={`w-2 h-2 rounded-full shrink-0 ${isIncome ? 'bg-green-500' : 'bg-red-400'}`}
       />
@@ -33,25 +51,26 @@ export default function TransactionRow({ transaction: tx, bookId, onDelete, isOw
         </p>
         <p className="text-xs text-gray-400 mt-0.5">{fmtDate(tx.date)}</p>
       </div>
-      <span className={`text-sm font-semibold shrink-0 ${isIncome ? 'text-green-600' : 'text-red-600'}`}>
-        {isIncome ? '+' : '-'}{fmt(tx.amount)}
-      </span>
       {isOwner && (
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-3 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
           <Link
             href={`/books/${bookId}/transactions/${tx.id}/edit`}
             className="text-xs text-gray-400 hover:text-gray-700 transition-colors"
+            onClick={e => e.stopPropagation()}
           >
             Bewerken
           </Link>
           <button
-            onClick={() => onDelete(tx.id)}
+            onClick={e => { e.stopPropagation(); onDelete(tx.id); }}
             className="text-xs text-red-400 hover:text-red-600 transition-colors"
           >
             Verwijderen
           </button>
         </div>
       )}
+      <span className={`text-sm font-semibold shrink-0 ${isIncome ? 'text-green-600' : 'text-red-600'}`}>
+        {isIncome ? '+' : '-'}{fmt(tx.amount)}
+      </span>
     </div>
   );
 }
