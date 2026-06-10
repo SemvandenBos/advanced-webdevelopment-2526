@@ -4,7 +4,7 @@ import { useState, useEffect, Fragment } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { DndContext, DragEndEvent } from '@dnd-kit/core';
+import { DndContext, DragEndEvent, DragStartEvent, DragOverlay } from '@dnd-kit/core';
 import { useInView } from 'react-intersection-observer';
 import { useAuth } from '@/contexts/AuthContext';
 import { getHuishoudboekje } from '@/lib/firestore/huishoudboekjes';
@@ -34,6 +34,7 @@ export default function BookDetailPage() {
   const [book, setBook] = useState<Huishoudboekje | null>(null);
   const [bookLoading, setBookLoading] = useState(true);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
+  const [activeTxId, setActiveTxId] = useState<string | null>(null);
 
   const { transactions, loadMore, loading: txLoading } = useInfiniteTransactions(id);
   const { data: chartData } = useMonthlyChartData(id);
@@ -62,7 +63,13 @@ export default function BookDetailPage() {
     await deleteTransaction(id, txId);
   };
 
+  const handleDragStart = (event: DragStartEvent) => {
+    const data = event.active.data.current as { type: string; txId?: string } | undefined;
+    if (data?.type === 'transaction') setActiveTxId(data.txId ?? null);
+  };
+
   const handleDragEnd = (event: DragEndEvent) => {
+    setActiveTxId(null);
     const { active, over } = event;
     if (!over) return;
     const a = active.data.current as { type: string; txId?: string } | undefined;
@@ -115,7 +122,7 @@ export default function BookDetailPage() {
         </div>
       </div>
 
-      <DndContext onDragEnd={handleDragEnd}>
+      <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-start">
           <div className="md:col-span-3 space-y-3">
             <p className="text-sm font-semibold text-gray-700">Inkomsten en uitgaven</p>
@@ -195,6 +202,25 @@ export default function BookDetailPage() {
             )}
           </div>
         </div>
+
+        <DragOverlay dropAnimation={null}>
+          {activeTxId && (() => {
+            const tx = transactions.find(t => t.id === activeTxId);
+            if (!tx) return null;
+            const isIncome = tx.type === 'income';
+            return (
+              <div className="bg-white border border-indigo-400 rounded-lg px-5 py-3 flex items-center gap-4 shadow-xl cursor-grabbing select-none opacity-95">
+                <span className={`w-2 h-2 rounded-full shrink-0 ${isIncome ? 'bg-green-500' : 'bg-red-400'}`} />
+                <p className="text-sm text-gray-800 truncate flex-1">
+                  {tx.description || (isIncome ? 'Inkomsten' : 'Uitgave')}
+                </p>
+                <span className={`text-sm font-semibold shrink-0 ${isIncome ? 'text-green-600' : 'text-red-600'}`}>
+                  {isIncome ? '+' : '-'}{new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(tx.amount)}
+                </span>
+              </div>
+            );
+          })()}
+        </DragOverlay>
       </DndContext>
 
       {chartData.some(m => m.income > 0 || m.expenses > 0) && (

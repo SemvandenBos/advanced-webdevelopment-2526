@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { Timestamp } from 'firebase/firestore';
 import { useDraggable } from '@dnd-kit/core';
-import { CSS } from '@dnd-kit/utilities';
 import { Transaction } from '@/types';
 
 function fmt(n: number) {
@@ -24,22 +23,19 @@ interface Props {
 export default function TransactionRow({ transaction: tx, bookId, onDelete, isOwner }: Props) {
   const isIncome = tx.type === 'income';
 
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: `tx-${tx.id}`,
     data: { type: 'transaction', txId: tx.id },
   });
 
-  const style = transform ? { transform: CSS.Transform.toString(transform) } : undefined;
-
   return (
     <div
       ref={setNodeRef}
-      style={style}
       {...attributes}
       {...listeners}
       className={[
         'group bg-white border border-gray-200 rounded-lg px-5 py-3 flex items-center gap-4 cursor-grab active:cursor-grabbing select-none',
-        isDragging ? 'opacity-50 shadow-lg z-50' : '',
+        isDragging ? 'opacity-30' : '',
       ].join(' ')}
     >
       <span
