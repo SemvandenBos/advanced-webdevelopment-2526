@@ -30,7 +30,14 @@ service cloud.firestore {
              request.auth.uid in book.data.members);
         }
 
-        allow read, write: if bookIsMember();
+        function bookIsOwner() {
+          let book = get(/databases/$(database)/documents/huishoudboekjes/$(bookId));
+          return request.auth != null &&
+            book.data.ownerUid == request.auth.uid;
+        }
+
+        allow read: if bookIsMember();
+        allow write: if bookIsOwner();
       }
 
       match /categories/{categoryId} {
@@ -41,7 +48,14 @@ service cloud.firestore {
              request.auth.uid in book.data.members);
         }
 
-        allow read, write: if bookIsMember();
+        function bookIsOwner() {
+          let book = get(/databases/$(database)/documents/huishoudboekjes/$(bookId));
+          return request.auth != null &&
+            book.data.ownerUid == request.auth.uid;
+        }
+
+        allow read: if bookIsMember();
+        allow write: if bookIsOwner();
       }
     }
   }

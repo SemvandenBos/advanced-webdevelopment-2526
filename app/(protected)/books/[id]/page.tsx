@@ -83,12 +83,14 @@ export default function BookDetailPage() {
           <Link href={`/books/${id}/categories`} className="text-sm text-gray-500 hover:underline">
             Categorieën
           </Link>
-          <Link
-            href={`/books/${id}/transactions/new`}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
-          >
-            + Transactie
-          </Link>
+          {isOwner && (
+            <Link
+              href={`/books/${id}/transactions/new`}
+              className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
+            >
+              + Transactie
+            </Link>
+          )}
         </div>
       </div>
 
@@ -116,7 +118,7 @@ export default function BookDetailPage() {
             <ul className="space-y-3 max-h-140 overflow-y-auto pr-1">
               {transactions.map(tx => (
                 <li key={tx.id}>
-                  <TransactionRow transaction={tx} bookId={id} onDelete={handleDelete} />
+                  <TransactionRow transaction={tx} bookId={id} onDelete={handleDelete} isOwner={isOwner} />
                 </li>
               ))}
             </ul>

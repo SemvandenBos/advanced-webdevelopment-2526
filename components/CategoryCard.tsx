@@ -6,13 +6,14 @@ interface Props {
   spent: number;
   bookId: string;
   onDelete: (id: string) => void;
+  isOwner: boolean;
 }
 
 function fmt(amount: number) {
   return amount.toLocaleString('nl-NL', { style: 'currency', currency: 'EUR' });
 }
 
-export default function CategoryCard({ category, spent, bookId, onDelete }: Props) {
+export default function CategoryCard({ category, spent, bookId, onDelete, isOwner }: Props) {
   const pct = category.maxBudget > 0 ? (spent / category.maxBudget) * 100 : 0;
   const barPct = Math.min(pct, 100);
 
@@ -36,20 +37,22 @@ export default function CategoryCard({ category, spent, bookId, onDelete }: Prop
             <p className="text-xs text-gray-400 mt-0.5">t/m {endDateLabel}</p>
           )}
         </div>
-        <div className="flex items-center gap-3 shrink-0 text-sm">
-          <Link
-            href={`/books/${bookId}/categories/${category.id}/edit`}
-            className="text-gray-500 hover:underline"
-          >
-            Bewerken
-          </Link>
-          <button
-            onClick={() => onDelete(category.id)}
-            className="text-red-500 hover:underline"
-          >
-            Verwijderen
-          </button>
-        </div>
+        {isOwner && (
+          <div className="flex items-center gap-3 shrink-0 text-sm">
+            <Link
+              href={`/books/${bookId}/categories/${category.id}/edit`}
+              className="text-gray-500 hover:underline"
+            >
+              Bewerken
+            </Link>
+            <button
+              onClick={() => onDelete(category.id)}
+              className="text-red-500 hover:underline"
+            >
+              Verwijderen
+            </button>
+          </div>
+        )}
       </div>
 
       <div>

@@ -1,17 +1,25 @@
 'use client';
 
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import TransactionForm from '@/components/TransactionForm';
 import { createTransaction } from '@/lib/firestore/transactions';
 import { useCategories } from '@/hooks/useCategories';
+import { getHuishoudboekje } from '@/lib/firestore/huishoudboekjes';
 
 export default function NewTransactionPage() {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const router = useRouter();
   const { categories } = useCategories(id);
+
+  useEffect(() => {
+    getHuishoudboekje(id).then(book => {
+      if (!book || book.ownerUid !== user?.uid) router.replace(`/books/${id}`);
+    });
+  }, [id, user?.uid, router]);
 
   const handleSubmit = async (data: {
     amount: number;

@@ -16,9 +16,10 @@ interface Props {
   transaction: Transaction;
   bookId: string;
   onDelete: (id: string) => void;
+  isOwner: boolean;
 }
 
-export default function TransactionRow({ transaction: tx, bookId, onDelete }: Props) {
+export default function TransactionRow({ transaction: tx, bookId, onDelete, isOwner }: Props) {
   const isIncome = tx.type === 'income';
 
   return (
@@ -35,20 +36,22 @@ export default function TransactionRow({ transaction: tx, bookId, onDelete }: Pr
       <span className={`text-sm font-semibold shrink-0 ${isIncome ? 'text-green-600' : 'text-red-600'}`}>
         {isIncome ? '+' : '-'}{fmt(tx.amount)}
       </span>
-      <div className="flex items-center gap-3 shrink-0">
-        <Link
-          href={`/books/${bookId}/transactions/${tx.id}/edit`}
-          className="text-xs text-gray-400 hover:text-gray-700 transition-colors"
-        >
-          Bewerken
-        </Link>
-        <button
-          onClick={() => onDelete(tx.id)}
-          className="text-xs text-red-400 hover:text-red-600 transition-colors"
-        >
-          Verwijderen
-        </button>
-      </div>
+      {isOwner && (
+        <div className="flex items-center gap-3 shrink-0">
+          <Link
+            href={`/books/${bookId}/transactions/${tx.id}/edit`}
+            className="text-xs text-gray-400 hover:text-gray-700 transition-colors"
+          >
+            Bewerken
+          </Link>
+          <button
+            onClick={() => onDelete(tx.id)}
+            className="text-xs text-red-400 hover:text-red-600 transition-colors"
+          >
+            Verwijderen
+          </button>
+        </div>
+      )}
     </div>
   );
 }
