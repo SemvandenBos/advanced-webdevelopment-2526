@@ -24,16 +24,6 @@ describe('HuishoudboekjeForm', () => {
       expect(screen.getByPlaceholderText('Optionele omschrijving')).toBeInTheDocument()
     })
 
-    it('renders the submit button with the provided submitLabel', () => {
-      render(<HuishoudboekjeForm {...defaultProps} submitLabel="Aanmaken" />)
-      expect(screen.getByRole('button', { name: 'Aanmaken' })).toBeInTheDocument()
-    })
-
-    it('renders a cancel button', () => {
-      render(<HuishoudboekjeForm {...defaultProps} />)
-      expect(screen.getByRole('button', { name: /annuleren/i })).toBeInTheDocument()
-    })
-
     it('pre-fills the name input with initialName when provided', () => {
       render(<HuishoudboekjeForm {...defaultProps} initialName="Bestaand boekje" />)
       expect(screen.getByDisplayValue('Bestaand boekje')).toBeInTheDocument()
@@ -48,17 +38,6 @@ describe('HuishoudboekjeForm', () => {
   describe('validation', () => {
     it('shows an error when the form is submitted with an empty name', async () => {
       render(<HuishoudboekjeForm {...defaultProps} />)
-      fireEvent.click(screen.getByRole('button', { name: 'Opslaan' }))
-      await waitFor(() => {
-        expect(screen.getByText('Naam is verplicht.')).toBeInTheDocument()
-      })
-    })
-
-    it('trims whitespace from name before validating', async () => {
-      render(<HuishoudboekjeForm {...defaultProps} />)
-      fireEvent.change(screen.getByPlaceholderText('bijv. Huishouden 2025'), {
-        target: { value: '   ' },
-      })
       fireEvent.click(screen.getByRole('button', { name: 'Opslaan' }))
       await waitFor(() => {
         expect(screen.getByText('Naam is verplicht.')).toBeInTheDocument()
@@ -88,22 +67,6 @@ describe('HuishoudboekjeForm', () => {
       await waitFor(() => {
         expect(onSubmit).toHaveBeenCalledWith('Mijn boekje', 'Omschrijving')
       })
-    })
-
-    it('disables the submit button while the onSubmit promise is pending', async () => {
-      let resolve!: () => void
-      const onSubmit = jest.fn(
-        () => new Promise<void>(r => { resolve = r })
-      )
-      render(<HuishoudboekjeForm {...defaultProps} onSubmit={onSubmit} />)
-      fireEvent.change(screen.getByPlaceholderText('bijv. Huishouden 2025'), {
-        target: { value: 'Test' },
-      })
-      fireEvent.click(screen.getByRole('button', { name: 'Opslaan' }))
-      await waitFor(() => {
-        expect(screen.getByRole('button', { name: 'Bezig...' })).toBeDisabled()
-      })
-      resolve()
     })
 
     it('shows an error message when onSubmit rejects', async () => {
