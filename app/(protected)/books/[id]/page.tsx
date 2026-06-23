@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Fragment } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
@@ -12,9 +12,9 @@ import { deleteTransaction, updateTransaction } from '@/lib/firestore/transactio
 import { useInfiniteTransactions, useMonthlyChartData } from '@/hooks/useTransactions';
 import { useCategories, useCategorySpending } from '@/hooks/useCategories';
 import { Huishoudboekje } from '@/types';
-import TransactionRow from '@/components/TransactionRow';
-import CategoryCompact from '@/components/CategoryCompact';
-import { TransactionListSkeleton } from '@/components/skeletons/TransactionSkeleton';
+import TransactionList from '@/components/TransactionList';
+import CategoryPanel from '@/components/CategoryPanel';
+import TransactionDragPreview from '@/components/TransactionDragPreview';
 
 const MonthlyLineChart = dynamic(
   () => import('@/components/charts/MonthlyLineChart'),
@@ -90,6 +90,8 @@ export default function BookDetailPage() {
     ? transactions.filter(tx => tx.categoryId === selectedCategoryId)
     : transactions;
 
+  const activeTx = activeTxId ? transactions.find(t => t.id === activeTxId) ?? null : null;
+
   return (
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
@@ -126,100 +128,28 @@ export default function BookDetailPage() {
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-start">
           <div className="md:col-span-3 space-y-3">
             <p className="text-sm font-semibold text-gray-700">Inkomsten en uitgaven</p>
-            {txLoading ? (
-              <TransactionListSkeleton />
-            ) : displayed.length === 0 ? (
-              <p className="text-gray-500 text-sm">
-                {selectedCategoryId ? 'Geen transacties in deze categorie.' : 'Geen transacties.'}
-              </p>
-            ) : (
-              <ul className="space-y-3 max-h-140 overflow-y-auto pr-1">
-                {displayed.map((tx, i) => {
-                  const txDate = tx.date.toDate();
-                  const prev = displayed[i - 1];
-                  const showHeader =
-                    i === 0 ||
-                    txDate.getMonth() !== prev.date.toDate().getMonth() ||
-                    txDate.getFullYear() !== prev.date.toDate().getFullYear();
-                  const headerLabel = txDate.toLocaleDateString('nl-NL', {
-                    month: 'long',
-                    year: 'numeric',
-                  });
-
-                  return (
-                    <Fragment key={tx.id}>
-                      {showHeader && (
-                        <li className="pt-1 first:pt-0">
-                          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1">
-                            {headerLabel}
-                          </p>
-                        </li>
-                      )}
-                      <li>
-                        <TransactionRow
-                          transaction={tx}
-                          bookId={id}
-                          onDelete={handleDelete}
-                          isOwner={isOwner}
-                        />
-                      </li>
-                    </Fragment>
-                  );
-                })}
-                <li>
-                  <div ref={sentinelRef} className="h-4" />
-                </li>
-              </ul>
-            )}
+            <TransactionList
+              transactions={displayed}
+              loading={txLoading}
+              selectedCategoryId={selectedCategoryId}
+              bookId={id}
+              isOwner={isOwner}
+              onDelete={handleDelete}
+              loadMoreRef={sentinelRef}
+            />
           </div>
 
-          <div className="md:col-span-2 md:sticky md:top-4 space-y-3">
-            <p className="text-sm font-semibold text-gray-700">Categorieën</p>
-            {categories.length === 0 ? (
-              <p className="text-xs text-gray-400">
-                Geen categorieën.{' '}
-                <Link href={`/books/${id}/categories`} className="underline hover:text-gray-600">
-                  Voeg er een toe
-                </Link>
-                .
-              </p>
-            ) : (
-              <ul className="space-y-3 max-h-140 overflow-y-auto pr-1">
-                {categories.map(cat => (
-                  <li key={cat.id}>
-                    <CategoryCompact
-                      category={cat}
-                      spent={spending.get(cat.id) ?? 0}
-                      isSelected={cat.id === selectedCategoryId}
-                      isFiltering={selectedCategoryId !== null}
-                      onClick={() =>
-                        setSelectedCategoryId(prev => (prev === cat.id ? null : cat.id))
-                      }
-                    />
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+          <CategoryPanel
+            categories={categories}
+            spending={spending}
+            selectedCategoryId={selectedCategoryId}
+            bookId={id}
+            onSelect={(catId) => setSelectedCategoryId(prev => (prev === catId ? null : catId))}
+          />
         </div>
 
         <DragOverlay dropAnimation={null}>
-          {activeTxId && (() => {
-            const tx = transactions.find(t => t.id === activeTxId);
-            if (!tx) return null;
-            const isIncome = tx.type === 'income';
-            return (
-              <div className="bg-white border border-indigo-400 rounded-lg px-5 py-3 flex items-center gap-4 shadow-xl cursor-grabbing select-none opacity-95">
-                <span className={`w-2 h-2 rounded-full shrink-0 ${isIncome ? 'bg-green-500' : 'bg-red-400'}`} />
-                <p className="text-sm text-gray-800 truncate flex-1">
-                  {tx.description || (isIncome ? 'Inkomsten' : 'Uitgave')}
-                </p>
-                <span className={`text-sm font-semibold shrink-0 ${isIncome ? 'text-green-600' : 'text-red-600'}`}>
-                  {isIncome ? '+' : '-'}{new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(tx.amount)}
-                </span>
-              </div>
-            );
-          })()}
+          {activeTx && <TransactionDragPreview transaction={activeTx} />}
         </DragOverlay>
       </DndContext>
 
