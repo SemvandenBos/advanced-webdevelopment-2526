@@ -14,6 +14,7 @@ jest.mock('@dnd-kit/core', () => ({
 
 const defaultProps = {
   loading: false,
+  hasMore: true,
   selectedCategoryId: null,
   bookId: 'book-1',
   isOwner: true,

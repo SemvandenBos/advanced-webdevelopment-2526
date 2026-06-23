@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { DndContext, DragEndEvent, DragStartEvent, DragOverlay } from '@dnd-kit/core';
+import { DndContext, DragEndEvent, DragStartEvent, DragOverlay, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { useInView } from 'react-intersection-observer';
 import { useAuth } from '@/contexts/AuthContext';
 import { getHuishoudboekje } from '@/lib/firestore/huishoudboekjes';
@@ -37,12 +37,16 @@ export default function BookDetailPage() {
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
   const [activeTxId, setActiveTxId] = useState<string | null>(null);
 
-  const { transactions, loadMore, loading: txLoading } = useInfiniteTransactions(id);
+  const { transactions, loadMore, loading: txLoading, hasMore } = useInfiniteTransactions(id);
   const { data: chartData } = useMonthlyChartData(id);
   const { categories } = useCategories(id);
   const { spending } = useCategorySpending(id);
 
   const { ref: sentinelRef, inView } = useInView({ threshold: 0 });
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+  );
 
   useEffect(() => {
     getHuishoudboekje(id).then(data => {
@@ -56,8 +60,8 @@ export default function BookDetailPage() {
   }, [id, router]);
 
   useEffect(() => {
-    if (inView) loadMore();
-  }, [inView]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (inView && hasMore) loadMore();
+  }, [inView, transactions.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleDelete = async (txId: string) => {
     if (!confirm('Weet je zeker dat je deze transactie wilt verwijderen?')) return;
@@ -125,13 +129,14 @@ export default function BookDetailPage() {
         </div>
       </div>
 
-      <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+      <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-start">
           <div className="md:col-span-3 space-y-3">
             <p className="text-sm font-semibold text-gray-700">Inkomsten en uitgaven</p>
             <TransactionList
               transactions={displayed}
               loading={txLoading}
+              hasMore={hasMore}
               selectedCategoryId={selectedCategoryId}
               bookId={id}
               isOwner={isOwner}
