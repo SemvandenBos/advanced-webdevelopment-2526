@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import HuishoudboekjeCard from '@/components/HuishoudboekjeCard';
 import { BooksListSkeleton } from '@/components/skeletons/BookCardSkeleton';
 import { archiveHuishoudboekje } from '@/lib/firestore/huishoudboekjes';
+import { secondaryButtonClass } from '@/components/ui/buttonStyles';
 
 export default function BooksPage() {
   const { books, loading } = useHuishoudboekjes();
@@ -23,7 +24,7 @@ export default function BooksPage() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Huishoudboekjes</h1>
         <div className="flex items-center gap-4">
-          <Link href="/books/archived" className="text-sm text-gray-500 hover:underline">
+          <Link href="/books/archived" className={secondaryButtonClass}>
             Gearchiveerd
           </Link>
           <Link
@@ -41,7 +42,7 @@ export default function BooksPage() {
           <section className="mb-8">
             <h2 className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">Mijn boekjes</h2>
             {ownedBooks.length === 0 ? (
-              <p className="text-gray-500 text-sm">Nog geen boekjes — voeg er een toe om te beginnen.</p>
+              <p className="text-gray-500 text-sm">Nog geen boekjes. Voeg er een toe om te beginnen.</p>
             ) : (
               <ul className="space-y-3">
                 {ownedBooks.map(book => (

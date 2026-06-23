@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Huishoudboekje } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
 import ShareModal from '@/components/ShareModal';
+import { secondaryButtonClass, dangerButtonClass, accentButtonClass } from '@/components/ui/buttonStyles';
 
 interface Props {
   book: Huishoudboekje;
@@ -18,16 +20,27 @@ export default function HuishoudboekjeCard({ book, isOwner, onArchive, onRestore
   const isArchived = !!onRestore;
   const [shareOpen, setShareOpen] = useState(false);
   const { user } = useAuth();
+  const router = useRouter();
+
+  const handleCardClick = () => {
+    if (!isArchived) router.push(`/books/${book.id}`);
+  };
 
   return (
     <>
-    <div className="bg-white border border-gray-200 rounded-lg p-5 flex items-start justify-between gap-4">
+    <div
+      onClick={handleCardClick}
+      className={`bg-white border border-gray-200 rounded-lg p-5 flex items-start justify-between gap-4 transition-colors ${
+        isArchived ? '' : 'cursor-pointer hover:border-blue-300'
+      }`}
+    >
       <div className="min-w-0">
         {isArchived ? (
           <span className="font-semibold text-gray-700 block truncate">{book.name}</span>
         ) : (
           <Link
             href={`/books/${book.id}`}
+            onClick={e => e.stopPropagation()}
             className="font-semibold text-gray-900 hover:text-blue-600 block truncate"
           >
             {book.name}
@@ -37,13 +50,13 @@ export default function HuishoudboekjeCard({ book, isOwner, onArchive, onRestore
           <p className="text-sm text-gray-500 mt-1 line-clamp-2">{book.description}</p>
         )}
       </div>
-      <div className="flex items-center gap-3 shrink-0">
+      <div className="flex items-center gap-2 shrink-0" onClick={e => e.stopPropagation()}>
         {isArchived ? (
           <>
             {isOwner && onRestore && (
               <button
                 onClick={() => onRestore(book.id)}
-                className="text-sm text-blue-600 hover:underline"
+                className={secondaryButtonClass}
               >
                 Terugzetten
               </button>
@@ -51,7 +64,7 @@ export default function HuishoudboekjeCard({ book, isOwner, onArchive, onRestore
             {isOwner && onDelete && (
               <button
                 onClick={() => onDelete(book.id)}
-                className="text-sm text-red-500 hover:underline"
+                className={dangerButtonClass}
               >
                 Verwijderen
               </button>
@@ -62,7 +75,7 @@ export default function HuishoudboekjeCard({ book, isOwner, onArchive, onRestore
             {isOwner && (
               <button
                 onClick={() => setShareOpen(true)}
-                className="text-sm text-blue-500 hover:underline"
+                className={accentButtonClass}
               >
                 Delen
               </button>
@@ -70,7 +83,7 @@ export default function HuishoudboekjeCard({ book, isOwner, onArchive, onRestore
             {isOwner && (
               <Link
                 href={`/books/${book.id}/edit`}
-                className="text-sm text-gray-500 hover:underline"
+                className={secondaryButtonClass}
               >
                 Bewerken
               </Link>
@@ -78,7 +91,7 @@ export default function HuishoudboekjeCard({ book, isOwner, onArchive, onRestore
             {isOwner && onArchive && (
               <button
                 onClick={() => onArchive(book.id)}
-                className="text-sm text-gray-500 hover:underline"
+                className={secondaryButtonClass}
               >
                 Archiveren
               </button>

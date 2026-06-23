@@ -4,18 +4,26 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
+import { DndContext, DragEndEvent, DragStartEvent, DragOverlay, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { useInView } from 'react-intersection-observer';
 import { useAuth } from '@/contexts/AuthContext';
 import { getHuishoudboekje } from '@/lib/firestore/huishoudboekjes';
-import { deleteTransaction } from '@/lib/firestore/transactions';
-import { useTransactions, useMonthlyChartData } from '@/hooks/useTransactions';
+import { deleteTransaction, updateTransaction } from '@/lib/firestore/transactions';
+import { useInfiniteTransactions, useMonthlyChartData } from '@/hooks/useTransactions';
+import { useCategories, useCategorySpending } from '@/hooks/useCategories';
 import { Huishoudboekje } from '@/types';
-import MonthNav from '@/components/MonthNav';
-import MonthlySummary from '@/components/MonthlySummary';
-import TransactionRow from '@/components/TransactionRow';
-import { TransactionListSkeleton } from '@/components/skeletons/TransactionSkeleton';
+import TransactionList from '@/components/TransactionList';
+import CategoryPanel from '@/components/CategoryPanel';
+import TransactionDragPreview from '@/components/TransactionDragPreview';
+import { secondaryButtonClass } from '@/components/ui/buttonStyles';
 
 const MonthlyLineChart = dynamic(
   () => import('@/components/charts/MonthlyLineChart'),
+  { ssr: false }
+);
+
+const MonthlyBarChart = dynamic(
+  () => import('@/components/charts/MonthlyBarChart'),
   { ssr: false }
 );
 
@@ -24,15 +32,21 @@ export default function BookDetailPage() {
   const { user } = useAuth();
   const router = useRouter();
 
-  const now = new Date();
-  const [year, setYear] = useState(now.getFullYear());
-  const [month, setMonth] = useState(now.getMonth());
-
   const [book, setBook] = useState<Huishoudboekje | null>(null);
   const [bookLoading, setBookLoading] = useState(true);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
+  const [activeTxId, setActiveTxId] = useState<string | null>(null);
 
-  const { transactions, loading: txLoading, summary } = useTransactions(id, year, month);
+  const { transactions, loadMore, loading: txLoading, hasMore } = useInfiniteTransactions(id);
   const { data: chartData } = useMonthlyChartData(id);
+  const { categories } = useCategories(id);
+  const { spending } = useCategorySpending(id);
+
+  const { ref: sentinelRef, inView } = useInView({ threshold: 0 });
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+  );
 
   useEffect(() => {
     getHuishoudboekje(id).then(data => {
@@ -45,9 +59,29 @@ export default function BookDetailPage() {
     });
   }, [id, router]);
 
+  useEffect(() => {
+    if (inView && hasMore) loadMore();
+  }, [inView, transactions.length]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleDelete = async (txId: string) => {
     if (!confirm('Weet je zeker dat je deze transactie wilt verwijderen?')) return;
     await deleteTransaction(id, txId);
+  };
+
+  const handleDragStart = (event: DragStartEvent) => {
+    const data = event.active.data.current as { type: string; txId?: string } | undefined;
+    if (data?.type === 'transaction') setActiveTxId(data.txId ?? null);
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    setActiveTxId(null);
+    const { active, over } = event;
+    if (!over) return;
+    const a = active.data.current as { type: string; txId?: string } | undefined;
+    const o = over.data.current as { type: string; categoryId?: string } | undefined;
+    if (a?.type === 'transaction' && o?.type === 'category' && a.txId && o.categoryId) {
+      updateTransaction(id, a.txId, { categoryId: o.categoryId });
+    }
   };
 
   if (bookLoading) {
@@ -57,12 +91,17 @@ export default function BookDetailPage() {
   if (!book) return null;
 
   const isOwner = book.ownerUid === user?.uid;
+  const displayed = selectedCategoryId
+    ? transactions.filter(tx => tx.categoryId === selectedCategoryId)
+    : transactions;
+
+  const activeTx = activeTxId ? transactions.find(t => t.id === activeTxId) ?? null : null;
 
   return (
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <Link href="/books" className="text-sm text-gray-500 hover:underline block mb-1">
+          <Link href="/books" className={`${secondaryButtonClass} mb-1`}>
             ← Terug naar overzicht
           </Link>
           <h1 className="text-2xl font-bold text-gray-900 truncate">{book.name}</h1>
@@ -70,54 +109,71 @@ export default function BookDetailPage() {
             <p className="text-sm text-gray-500 mt-1">{book.description}</p>
           )}
         </div>
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           {isOwner && (
-            <Link href={`/books/${id}/edit`} className="text-sm text-gray-500 hover:underline">
+            <Link href={`/books/${id}/edit`} className={secondaryButtonClass}>
               Bewerken
             </Link>
           )}
-          <Link
-            href={`/books/${id}/transactions/new`}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
-          >
-            + Transactie
+          <Link href={`/books/${id}/categories`} className={secondaryButtonClass}>
+            Categorieën
           </Link>
+          {isOwner && (
+            <Link
+              href={`/books/${id}/transactions/new`}
+              className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
+            >
+              + Transactie
+            </Link>
+          )}
         </div>
       </div>
 
-      <div className="flex items-center justify-between">
-        <MonthNav
-          year={year}
-          month={month}
-          onChange={(y, m) => {
-            setYear(y);
-            setMonth(m);
-          }}
-        />
-      </div>
+      <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-start">
+          <div className="md:col-span-3 space-y-3">
+            <p className="text-sm font-semibold text-gray-700">Inkomsten en uitgaven</p>
+            <TransactionList
+              transactions={displayed}
+              loading={txLoading}
+              hasMore={hasMore}
+              selectedCategoryId={selectedCategoryId}
+              bookId={id}
+              isOwner={isOwner}
+              onDelete={handleDelete}
+              loadMoreRef={sentinelRef}
+            />
+          </div>
 
-      <MonthlySummary {...summary} />
+          <CategoryPanel
+            categories={categories}
+            spending={spending}
+            selectedCategoryId={selectedCategoryId}
+            bookId={id}
+            isOwner={isOwner}
+            onSelect={(catId) => setSelectedCategoryId(prev => (prev === catId ? null : catId))}
+          />
+        </div>
 
-      {txLoading ? (
-        <TransactionListSkeleton />
-      ) : transactions.length === 0 ? (
-        <p className="text-gray-500 text-sm">Geen transacties in deze maand.</p>
-      ) : (
-        <ul className="space-y-2">
-          {transactions.map(tx => (
-            <li key={tx.id}>
-              <TransactionRow transaction={tx} bookId={id} onDelete={handleDelete} />
-            </li>
-          ))}
-        </ul>
-      )}
+        <DragOverlay dropAnimation={null}>
+          {activeTx && <TransactionDragPreview transaction={activeTx} />}
+        </DragOverlay>
+      </DndContext>
 
       {chartData.some(m => m.income > 0 || m.expenses > 0) && (
-        <div className="bg-white border border-gray-200 rounded-lg p-5">
-          <h2 className="text-sm font-semibold text-gray-700 mb-4">
-            Inkomsten vs uitgaven — laatste 6 maanden
-          </h2>
-          <MonthlyLineChart data={chartData} />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-white border border-gray-200 rounded-lg p-5">
+            <h2 className="text-sm font-semibold text-gray-700 mb-4">
+              Inkomsten vs uitgaven laatste 6 maanden
+            </h2>
+            <MonthlyBarChart data={chartData} />
+          </div>
+          <div className="bg-white border border-gray-200 rounded-lg p-5">
+            <h2 className="text-sm font-semibold text-gray-700 mb-4">
+              Verloop laatste 6 maanden
+            </h2>
+            <MonthlyLineChart data={chartData} />
+          </div>
         </div>
       )}
     </div>
