@@ -6,6 +6,11 @@ jest.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({ user: mockUser }),
 }))
 
+const mockPush = jest.fn()
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({ push: mockPush }),
+}))
+
 jest.mock('@/lib/firestore/huishoudboekjes', () => ({
   addMember: jest.fn(),
   removeMember: jest.fn(),
@@ -19,7 +24,36 @@ jest.mock('@/lib/firestore/users', () => ({
 describe('HuishoudboekjeCard', () => {
   beforeEach(() => jest.clearAllMocks())
 
-  describe('non-archived book — owner', () => {
+  describe('whole card click', () => {
+    it('navigates to the book page when clicking anywhere on the card', () => {
+      render(<HuishoudboekjeCard book={mockBook} isOwner={true} onArchive={jest.fn()} />)
+      fireEvent.click(screen.getByText('Een testomschrijving'))
+      expect(mockPush).toHaveBeenCalledWith('/books/book-1')
+    })
+
+    it('does not navigate when clicking an action button inside the card', () => {
+      const onArchive = jest.fn()
+      render(<HuishoudboekjeCard book={mockBook} isOwner={true} onArchive={onArchive} />)
+      fireEvent.click(screen.getByRole('button', { name: /archiveren/i }))
+      expect(mockPush).not.toHaveBeenCalled()
+    })
+
+    it('does not navigate when clicking an archived card', () => {
+      const archivedBook = { ...mockBook, archived: true }
+      render(
+        <HuishoudboekjeCard
+          book={archivedBook}
+          isOwner={true}
+          onRestore={jest.fn()}
+          onDelete={jest.fn()}
+        />
+      )
+      fireEvent.click(screen.getByText('Testboekje'))
+      expect(mockPush).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('non-archived book: owner', () => {
     it('renders the book name as a clickable link', () => {
       render(<HuishoudboekjeCard book={mockBook} isOwner={true} />)
       expect(screen.getByRole('link', { name: 'Testboekje' })).toHaveAttribute(
@@ -59,12 +93,12 @@ describe('HuishoudboekjeCard', () => {
       render(<HuishoudboekjeCard book={mockBook} isOwner={true} />)
       fireEvent.click(screen.getByRole('button', { name: /delen/i }))
       await waitFor(() => {
-        expect(screen.getByText(/delen — testboekje/i)).toBeInTheDocument()
+        expect(screen.getByText(/delen: testboekje/i)).toBeInTheDocument()
       })
     })
   })
 
-  describe('non-archived book — member (non-owner)', () => {
+  describe('non-archived book: member (non-owner)', () => {
     it('renders the book name as a link', () => {
       render(<HuishoudboekjeCard book={mockBook} isOwner={false} />)
       expect(screen.getByRole('link', { name: 'Testboekje' })).toBeInTheDocument()
@@ -78,7 +112,7 @@ describe('HuishoudboekjeCard', () => {
     })
   })
 
-  describe('archived book — owner', () => {
+  describe('archived book: owner', () => {
     const archivedBook = { ...mockBook, archived: true }
 
     it('renders the book name as plain text (not a link)', () => {

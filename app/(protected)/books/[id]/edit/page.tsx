@@ -24,7 +24,7 @@ export default function EditBookPage() {
 
   if (loading) return <p className="text-sm text-gray-400">Laden...</p>;
   if (!book) return <p className="text-sm text-red-500">Boekje niet gevonden.</p>;
-  if (book.ownerUid !== user?.uid) return <p className="text-sm text-red-500">Geen toegang — alleen de eigenaar kan dit bewerken.</p>;
+  if (book.ownerUid !== user?.uid) return <p className="text-sm text-red-500">Geen toegang: alleen de eigenaar kan dit bewerken.</p>;
 
   const handleSubmit = async (name: string, description: string) => {
     await updateHuishoudboekje(id, { name, description });
