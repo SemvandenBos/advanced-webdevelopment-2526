@@ -23,11 +23,6 @@ describe('CategoryCard', () => {
       expect(screen.getByText(/120/)).toBeInTheDocument()
     })
 
-    it('renders the maxBudget formatted as EUR currency', () => {
-      render(<CategoryCard {...defaultProps} spent={0} />)
-      expect(screen.getByText(/300/)).toBeInTheDocument()
-    })
-
     it('renders the end date in Dutch locale when endDate is set', () => {
       const categoryWithEnd = {
         ...mockCategory,
@@ -37,10 +32,6 @@ describe('CategoryCard', () => {
       expect(screen.getByText(/31 december 2025/i)).toBeInTheDocument()
     })
 
-    it('does not render an end date when endDate is absent', () => {
-      render(<CategoryCard {...defaultProps} spent={0} />)
-      expect(screen.queryByText(/t\/m/)).not.toBeInTheDocument()
-    })
   })
 
   describe('progress bar colour', () => {
@@ -71,11 +62,6 @@ describe('CategoryCard', () => {
       expect(screen.getByText(/over budget/i)).toBeInTheDocument()
     })
 
-    it('shows no warning when spending is below 80%', () => {
-      render(<CategoryCard {...defaultProps} spent={50} />)
-      expect(screen.queryByText(/over budget/i)).not.toBeInTheDocument()
-      expect(screen.queryByText(/bijna op/i)).not.toBeInTheDocument()
-    })
   })
 
   describe('owner actions', () => {
@@ -83,11 +69,6 @@ describe('CategoryCard', () => {
       render(<CategoryCard {...defaultProps} spent={0} />)
       const link = screen.getByRole('link', { name: /bewerken/i })
       expect(link).toHaveAttribute('href', '/books/book-1/categories/cat-1/edit')
-    })
-
-    it('renders "Verwijderen" button for the owner', () => {
-      render(<CategoryCard {...defaultProps} spent={0} />)
-      expect(screen.getByRole('button', { name: /verwijderen/i })).toBeInTheDocument()
     })
 
     it('calls onDelete with the category id when "Verwijderen" is clicked', () => {

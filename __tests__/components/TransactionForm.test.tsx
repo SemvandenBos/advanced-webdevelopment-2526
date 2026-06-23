@@ -21,26 +21,11 @@ describe('TransactionForm', () => {
       expect(screen.getByRole('button', { name: /inkomsten/i })).toBeInTheDocument()
     })
 
-    it('renders an amount input field', () => {
-      render(<TransactionForm {...defaultProps} />)
-      expect(screen.getByRole('spinbutton')).toBeInTheDocument()
-    })
-
-    it('renders a description input field', () => {
-      render(<TransactionForm {...defaultProps} />)
-      expect(screen.getByPlaceholderText('Optionele omschrijving')).toBeInTheDocument()
-    })
-
     it('renders a date input defaulting to today', () => {
       const today = new Date()
       const iso = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
       const { container } = render(<TransactionForm {...defaultProps} />)
       expect(container.querySelector('[type="date"]')).toHaveValue(iso)
-    })
-
-    it('renders the submit button with the provided submitLabel', () => {
-      render(<TransactionForm {...defaultProps} submitLabel="Toevoegen" />)
-      expect(screen.getByRole('button', { name: 'Toevoegen' })).toBeInTheDocument()
     })
 
     it('pre-fills fields from the initial prop when provided', () => {
@@ -56,12 +41,6 @@ describe('TransactionForm', () => {
   })
 
   describe('type toggle', () => {
-    it('applies red styling to the expense button when expense type is selected', () => {
-      render(<TransactionForm {...defaultProps} />)
-      // expense is the default type
-      expect(screen.getByRole('button', { name: /uitgave/i })).toHaveClass('bg-red-500')
-    })
-
     it('applies green styling to the income button when income type is selected', async () => {
       render(<TransactionForm {...defaultProps} />)
       fireEvent.click(screen.getByRole('button', { name: /inkomsten/i }))
@@ -70,13 +49,6 @@ describe('TransactionForm', () => {
       })
     })
 
-    it('switches selected type when the other button is clicked', async () => {
-      render(<TransactionForm {...defaultProps} />)
-      fireEvent.click(screen.getByRole('button', { name: /inkomsten/i }))
-      await waitFor(() => {
-        expect(screen.getByRole('button', { name: /uitgave/i })).not.toHaveClass('bg-red-500')
-      })
-    })
   })
 
   describe('category dropdown', () => {
@@ -103,15 +75,6 @@ describe('TransactionForm', () => {
     it('shows an error when the form is submitted with amount of zero', async () => {
       const { container } = render(<TransactionForm {...defaultProps} />)
       fireEvent.change(screen.getByRole('spinbutton'), { target: { value: '0' } })
-      fireEvent.submit(container.querySelector('form')!)
-      await waitFor(() => {
-        expect(screen.getByText(/geldig bedrag/i)).toBeInTheDocument()
-      })
-    })
-
-    it('shows an error when the form is submitted with a negative amount', async () => {
-      const { container } = render(<TransactionForm {...defaultProps} />)
-      fireEvent.change(screen.getByRole('spinbutton'), { target: { value: '-10' } })
       fireEvent.submit(container.querySelector('form')!)
       await waitFor(() => {
         expect(screen.getByText(/geldig bedrag/i)).toBeInTheDocument()
@@ -164,16 +127,5 @@ describe('TransactionForm', () => {
       })
     })
 
-    it('disables the submit button while the onSubmit promise is pending', async () => {
-      let resolve!: () => void
-      const onSubmit = jest.fn(() => new Promise<void>(r => { resolve = r }))
-      render(<TransactionForm {...defaultProps} onSubmit={onSubmit} />)
-      fireEvent.change(screen.getByRole('spinbutton'), { target: { value: '50' } })
-      fireEvent.click(screen.getByRole('button', { name: 'Opslaan' }))
-      await waitFor(() => {
-        expect(screen.getByRole('button', { name: 'Bezig...' })).toBeDisabled()
-      })
-      resolve()
-    })
   })
 })

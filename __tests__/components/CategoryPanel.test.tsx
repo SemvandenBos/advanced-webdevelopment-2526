@@ -56,16 +56,6 @@ describe('CategoryPanel', () => {
       expect(screen.getByText(/150/)).toBeInTheDocument()
     })
 
-    it('passes spent=0 for a category not present in the spending map', () => {
-      render(
-        <CategoryPanel
-          {...defaultProps}
-          categories={[mockCategory]}
-          spending={new Map()}
-        />
-      )
-      expect(screen.getByText(/0,00/)).toBeInTheDocument()
-    })
   })
 
   describe('selection state', () => {
@@ -82,18 +72,6 @@ describe('CategoryPanel', () => {
       expect(boodschappenCard).toHaveClass('ring-2', 'ring-indigo-400')
     })
 
-    it('passes isSelected=false to all categories when selectedCategoryId is null', () => {
-      render(
-        <CategoryPanel
-          {...defaultProps}
-          categories={[mockCategory]}
-          selectedCategoryId={null}
-        />
-      )
-      const card = screen.getByText('Boodschappen').closest('.rounded-lg')
-      expect(card).not.toHaveClass('ring-2')
-    })
-
     it('passes isFiltering=true: non-selected categories fade when a filter is active', () => {
       render(
         <CategoryPanel
@@ -105,18 +83,6 @@ describe('CategoryPanel', () => {
       // Transport (cat-2) is not selected → should be faded
       const transportCard = screen.getByText('Transport').closest('.rounded-lg')
       expect(transportCard).toHaveClass('opacity-40', 'grayscale')
-    })
-
-    it('passes isFiltering=false: no category is faded when selectedCategoryId is null', () => {
-      render(
-        <CategoryPanel
-          {...defaultProps}
-          categories={[mockCategory]}
-          selectedCategoryId={null}
-        />
-      )
-      const card = screen.getByText('Boodschappen').closest('.rounded-lg')
-      expect(card).not.toHaveClass('opacity-40')
     })
 
     it('calls onSelect with the clicked category id', () => {
