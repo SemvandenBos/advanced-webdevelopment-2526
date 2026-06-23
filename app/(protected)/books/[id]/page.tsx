@@ -36,7 +36,7 @@ export default function BookDetailPage() {
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
   const [activeTxId, setActiveTxId] = useState<string | null>(null);
 
-  const { transactions, loadMore, loading: txLoading } = useInfiniteTransactions(id);
+  const { transactions, loadMore, loading: txLoading, hasMore } = useInfiniteTransactions(id);
   const { data: chartData } = useMonthlyChartData(id);
   const { categories } = useCategories(id);
   const { spending } = useCategorySpending(id);
@@ -55,8 +55,8 @@ export default function BookDetailPage() {
   }, [id, router]);
 
   useEffect(() => {
-    if (inView) loadMore();
-  }, [inView]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (inView && hasMore) loadMore();
+  }, [inView, transactions.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleDelete = async (txId: string) => {
     if (!confirm('Weet je zeker dat je deze transactie wilt verwijderen?')) return;
@@ -131,6 +131,7 @@ export default function BookDetailPage() {
             <TransactionList
               transactions={displayed}
               loading={txLoading}
+              hasMore={hasMore}
               selectedCategoryId={selectedCategoryId}
               bookId={id}
               isOwner={isOwner}

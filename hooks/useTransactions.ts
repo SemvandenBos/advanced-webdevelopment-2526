@@ -30,6 +30,8 @@ export function useTransactions(bookId: string, year: number, month: number) {
   return { transactions, loading, summary };
 }
 
+const MAX_MONTHS = 24;
+
 export function useInfiniteTransactions(bookId: string) {
   const [months, setMonths] = useState<{ year: number; month: number }[]>(() => {
     const now = new Date();
@@ -66,17 +68,20 @@ export function useInfiniteTransactions(bookId: string) {
     [transactionsByMonth],
   );
 
+  const hasMore = months.length < MAX_MONTHS;
+
   const loadMore = useCallback(() => {
+    if (!hasMore) return;
     setMonths(prev => {
       const { year, month } = prev[prev.length - 1];
       const d = new Date(year, month - 1);
       return [...prev, { year: d.getFullYear(), month: d.getMonth() }];
     });
-  }, []);
+  }, [hasMore]);
 
   const loading = transactionsByMonth.size === 0;
 
-  return { transactions, loadMore, loading };
+  return { transactions, loadMore, loading, hasMore };
 }
 
 export interface MonthlyTotal {

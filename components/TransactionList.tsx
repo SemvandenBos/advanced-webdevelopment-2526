@@ -8,6 +8,7 @@ import { TransactionListSkeleton } from '@/components/skeletons/TransactionSkele
 interface Props {
   transactions: Transaction[];
   loading: boolean;
+  hasMore: boolean;
   selectedCategoryId: string | null;
   bookId: string;
   isOwner: boolean;
@@ -18,6 +19,7 @@ interface Props {
 export default function TransactionList({
   transactions,
   loading,
+  hasMore,
   selectedCategoryId,
   bookId,
   isOwner,
@@ -28,9 +30,16 @@ export default function TransactionList({
 
   if (transactions.length === 0) {
     return (
-      <p className="text-gray-500 text-sm">
-        {selectedCategoryId ? 'Geen transacties in deze categorie.' : 'Geen transacties.'}
-      </p>
+      <div className="space-y-2">
+        <p className="text-gray-500 text-sm">
+          {selectedCategoryId ? 'Geen transacties in deze categorie.' : 'Geen transacties.'}
+        </p>
+        {hasMore ? (
+          <div ref={loadMoreRef} className="h-4" />
+        ) : (
+          <p className="text-xs text-gray-400">Geen oudere transacties.</p>
+        )}
+      </div>
     );
   }
 
@@ -68,9 +77,13 @@ export default function TransactionList({
           </Fragment>
         );
       })}
-      <li>
-        <div ref={loadMoreRef} className="h-4" />
-      </li>
+      {hasMore ? (
+        <li>
+          <div ref={loadMoreRef} className="h-4" />
+        </li>
+      ) : (
+        <li className="text-center text-xs text-gray-400 py-2">Geen oudere transacties.</li>
+      )}
     </ul>
   );
 }
