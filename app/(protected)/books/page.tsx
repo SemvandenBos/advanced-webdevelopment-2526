@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import HuishoudboekjeCard from '@/components/HuishoudboekjeCard';
 import { BooksListSkeleton } from '@/components/skeletons/BookCardSkeleton';
 import { archiveHuishoudboekje } from '@/lib/firestore/huishoudboekjes';
+import { secondaryButtonClass } from '@/components/ui/buttonStyles';
 
 export default function BooksPage() {
   const { books, loading } = useHuishoudboekjes();
@@ -23,10 +24,7 @@ export default function BooksPage() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Huishoudboekjes</h1>
         <div className="flex items-center gap-4">
-          <Link
-            href="/books/archived"
-            className="inline-flex items-center justify-center px-3 py-1.5 rounded-md text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition-colors"
-          >
+          <Link href="/books/archived" className={secondaryButtonClass}>
             Gearchiveerd
           </Link>
           <Link

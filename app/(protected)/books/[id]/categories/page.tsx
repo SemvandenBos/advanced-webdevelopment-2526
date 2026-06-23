@@ -8,6 +8,7 @@ import { getHuishoudboekje } from '@/lib/firestore/huishoudboekjes';
 import { useCategories, useCategorySpending } from '@/hooks/useCategories';
 import { deleteCategory } from '@/lib/firestore/categories';
 import CategoryCard from '@/components/CategoryCard';
+import { secondaryButtonClass } from '@/components/ui/buttonStyles';
 
 export default function CategoriesPage() {
   const { id } = useParams<{ id: string }>();
@@ -31,7 +32,7 @@ export default function CategoriesPage() {
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <Link href={`/books/${id}`} className="text-sm text-gray-500 hover:underline block mb-1">
+          <Link href={`/books/${id}`} className={`${secondaryButtonClass} mb-1`}>
             ← Terug naar boek
           </Link>
           <h1 className="text-2xl font-bold text-gray-900">Categorieën</h1>

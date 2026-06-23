@@ -15,6 +15,7 @@ import { Huishoudboekje } from '@/types';
 import TransactionList from '@/components/TransactionList';
 import CategoryPanel from '@/components/CategoryPanel';
 import TransactionDragPreview from '@/components/TransactionDragPreview';
+import { secondaryButtonClass } from '@/components/ui/buttonStyles';
 
 const MonthlyLineChart = dynamic(
   () => import('@/components/charts/MonthlyLineChart'),
@@ -96,7 +97,7 @@ export default function BookDetailPage() {
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <Link href="/books" className="text-sm text-gray-500 hover:underline block mb-1">
+          <Link href="/books" className={`${secondaryButtonClass} mb-1`}>
             ← Terug naar overzicht
           </Link>
           <h1 className="text-2xl font-bold text-gray-900 truncate">{book.name}</h1>
@@ -104,13 +105,13 @@ export default function BookDetailPage() {
             <p className="text-sm text-gray-500 mt-1">{book.description}</p>
           )}
         </div>
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           {isOwner && (
-            <Link href={`/books/${id}/edit`} className="text-sm text-gray-500 hover:underline">
+            <Link href={`/books/${id}/edit`} className={secondaryButtonClass}>
               Bewerken
             </Link>
           )}
-          <Link href={`/books/${id}/categories`} className="text-sm text-gray-500 hover:underline">
+          <Link href={`/books/${id}/categories`} className={secondaryButtonClass}>
             Categorieën
           </Link>
           {isOwner && (

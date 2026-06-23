@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import CategoryForm from '@/components/CategoryForm';
 import { getCategory, updateCategory } from '@/lib/firestore/categories';
 import { getHuishoudboekje } from '@/lib/firestore/huishoudboekjes';
+import { secondaryButtonClass } from '@/components/ui/buttonStyles';
 import { Category } from '@/types';
 
 function toDateInput(cat: Category): string {
@@ -49,10 +50,7 @@ export default function EditCategoryPage() {
 
   return (
     <div>
-      <Link
-        href={`/books/${id}/categories`}
-        className="text-sm text-gray-500 hover:underline block mb-6"
-      >
+      <Link href={`/books/${id}/categories`} className={`${secondaryButtonClass} mb-6`}>
         ← Terug
       </Link>
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Categorie bewerken</h1>

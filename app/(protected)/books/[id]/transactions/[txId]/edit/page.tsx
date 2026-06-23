@@ -6,6 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { getTransaction, updateTransaction } from '@/lib/firestore/transactions';
 import { getHuishoudboekje } from '@/lib/firestore/huishoudboekjes';
+import { secondaryButtonClass } from '@/components/ui/buttonStyles';
 import TransactionForm from '@/components/TransactionForm';
 import { Transaction } from '@/types';
 import { useCategories } from '@/hooks/useCategories';
@@ -52,7 +53,7 @@ export default function EditTransactionPage() {
 
   return (
     <div>
-      <Link href={`/books/${id}`} className="text-sm text-gray-500 hover:underline block mb-6">
+      <Link href={`/books/${id}`} className={`${secondaryButtonClass} mb-6`}>
         ← Terug
       </Link>
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Transactie bewerken</h1>

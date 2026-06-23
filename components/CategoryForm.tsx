@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { secondaryButtonClass } from '@/components/ui/buttonStyles';
 
 interface FormValues {
   name: string;
@@ -118,7 +119,7 @@ export default function CategoryForm({ initial, onSubmit, submitLabel }: Props) 
         <button
           type="button"
           onClick={() => router.back()}
-          className="text-sm text-gray-500 hover:underline"
+          className={secondaryButtonClass}
         >
           Annuleren
         </button>
