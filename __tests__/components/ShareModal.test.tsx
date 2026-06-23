@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import ShareModal from '@/components/ShareModal'
 import { mockBook, mockUser, mockMember } from '../fixtures'
 import { getUserByEmail, getUserDocument } from '@/lib/firestore/users'
@@ -29,13 +29,13 @@ describe('ShareModal', () => {
   })
 
   describe('rendering', () => {
-    it('renders a modal overlay', () => {
-      render(<ShareModal {...defaultProps} />)
+    it('renders a modal overlay', async () => {
+      await act(async () => { render(<ShareModal {...defaultProps} />) })
       expect(screen.getByText(/delen: testboekje/i)).toBeInTheDocument()
     })
 
-    it('renders the email input and invite button', () => {
-      render(<ShareModal {...defaultProps} />)
+    it('renders the email input and invite button', async () => {
+      await act(async () => { render(<ShareModal {...defaultProps} />) })
       expect(screen.getByPlaceholderText(/e-mailadres uitnodigen/i)).toBeInTheDocument()
       expect(screen.getByRole('button', { name: /uitnodigen/i })).toBeInTheDocument()
     })
