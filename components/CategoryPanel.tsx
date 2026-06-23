@@ -9,6 +9,7 @@ interface Props {
   spending: Map<string, number>;
   selectedCategoryId: string | null;
   bookId: string;
+  isOwner: boolean;
   onSelect: (categoryId: string) => void;
 }
 
@@ -17,6 +18,7 @@ export default function CategoryPanel({
   spending,
   selectedCategoryId,
   bookId,
+  isOwner,
   onSelect,
 }: Props) {
   return (
@@ -39,6 +41,7 @@ export default function CategoryPanel({
                 spent={spending.get(cat.id) ?? 0}
                 isSelected={cat.id === selectedCategoryId}
                 isFiltering={selectedCategoryId !== null}
+                isOwner={isOwner}
                 onClick={() => onSelect(cat.id)}
               />
             </li>

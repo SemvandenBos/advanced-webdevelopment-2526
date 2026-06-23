@@ -26,6 +26,7 @@ export default function TransactionRow({ transaction: tx, bookId, onDelete, isOw
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: `tx-${tx.id}`,
     data: { type: 'transaction', txId: tx.id },
+    disabled: !isOwner,
   });
 
   return (
@@ -34,7 +35,8 @@ export default function TransactionRow({ transaction: tx, bookId, onDelete, isOw
       {...attributes}
       {...listeners}
       className={[
-        'group bg-white border border-gray-200 rounded-lg px-5 py-3 flex items-center gap-4 cursor-grab active:cursor-grabbing select-none',
+        'group bg-white border border-gray-200 rounded-lg px-5 py-3 flex items-center gap-4 select-none',
+        isOwner ? 'cursor-grab active:cursor-grabbing' : '',
         isDragging ? 'opacity-30' : '',
       ].join(' ')}
     >

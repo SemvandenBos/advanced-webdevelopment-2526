@@ -149,5 +149,35 @@ describe('TransactionRow', () => {
       )
       expect(container.firstChild).not.toHaveClass('opacity-30')
     })
+
+    it('passes disabled: false to useDraggable for the owner', () => {
+      render(<TransactionRow {...defaultProps} transaction={mockTransaction} />)
+      expect(useDraggable).toHaveBeenCalledWith(
+        expect.objectContaining({ disabled: false })
+      )
+    })
+
+    it('passes disabled: true to useDraggable for non-owners', () => {
+      render(
+        <TransactionRow {...defaultProps} transaction={mockTransaction} isOwner={false} />
+      )
+      expect(useDraggable).toHaveBeenCalledWith(
+        expect.objectContaining({ disabled: true })
+      )
+    })
+
+    it('renders a grab cursor for the owner', () => {
+      const { container } = render(
+        <TransactionRow {...defaultProps} transaction={mockTransaction} />
+      )
+      expect(container.firstChild).toHaveClass('cursor-grab')
+    })
+
+    it('does not render a grab cursor for non-owners', () => {
+      const { container } = render(
+        <TransactionRow {...defaultProps} transaction={mockTransaction} isOwner={false} />
+      )
+      expect(container.firstChild).not.toHaveClass('cursor-grab')
+    })
   })
 })
