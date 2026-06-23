@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Category } from '@/types';
+import { secondaryButtonClass, dangerButtonClass } from '@/components/ui/buttonStyles';
 
 interface Props {
   category: Category;
@@ -38,16 +39,16 @@ export default function CategoryCard({ category, spent, bookId, onDelete, isOwne
           )}
         </div>
         {isOwner && (
-          <div className="flex items-center gap-3 shrink-0 text-sm">
+          <div className="flex items-center gap-2 shrink-0">
             <Link
               href={`/books/${bookId}/categories/${category.id}/edit`}
-              className="text-gray-500 hover:underline"
+              className={secondaryButtonClass}
             >
               Bewerken
             </Link>
             <button
               onClick={() => onDelete(category.id)}
-              className="text-red-500 hover:underline"
+              className={dangerButtonClass}
             >
               Verwijderen
             </button>

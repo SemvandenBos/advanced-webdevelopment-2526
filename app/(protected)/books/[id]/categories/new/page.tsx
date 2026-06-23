@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import CategoryForm from '@/components/CategoryForm';
 import { createCategory } from '@/lib/firestore/categories';
 import { getHuishoudboekje } from '@/lib/firestore/huishoudboekjes';
+import { secondaryButtonClass } from '@/components/ui/buttonStyles';
 
 export default function NewCategoryPage() {
   const { id } = useParams<{ id: string }>();
@@ -26,10 +27,7 @@ export default function NewCategoryPage() {
 
   return (
     <div>
-      <Link
-        href={`/books/${id}/categories`}
-        className="text-sm text-gray-500 hover:underline block mb-6"
-      >
+      <Link href={`/books/${id}/categories`} className={`${secondaryButtonClass} mb-6`}>
         ← Terug
       </Link>
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Categorie toevoegen</h1>

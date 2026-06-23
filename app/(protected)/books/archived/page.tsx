@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import HuishoudboekjeCard from '@/components/HuishoudboekjeCard';
 import { BooksListSkeleton } from '@/components/skeletons/BookCardSkeleton';
 import { restoreHuishoudboekje, deleteHuishoudboekje } from '@/lib/firestore/huishoudboekjes';
+import { secondaryButtonClass } from '@/components/ui/buttonStyles';
 
 export default function ArchivedBooksPage() {
   const { books, loading } = useArchivedHuishoudboekjes();
@@ -23,7 +24,7 @@ export default function ArchivedBooksPage() {
   return (
     <div>
       <div className="flex items-center gap-4 mb-6">
-        <Link href="/books" className="text-sm text-gray-500 hover:underline">
+        <Link href="/books" className={secondaryButtonClass}>
           ← Terug naar overzicht
         </Link>
         <h1 className="text-2xl font-bold text-gray-900">Gearchiveerde boekjes</h1>

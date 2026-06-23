@@ -52,7 +52,6 @@ export function useInfiniteTransactions(bookId: string) {
       });
     });
     unsubscribersRef.current.push(unsub);
-    // Intentionally no cleanup return — keep all month subscriptions alive until unmount
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [months.length]);
 

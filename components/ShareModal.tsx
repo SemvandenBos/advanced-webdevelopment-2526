@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Huishoudboekje, AppUser } from '@/types';
 import { getUserByEmail, getUserDocument } from '@/lib/firestore/users';
 import { addMember, removeMember } from '@/lib/firestore/huishoudboekjes';
+import { secondaryButtonClass } from '@/components/ui/buttonStyles';
 
 interface Props {
   book: Huishoudboekje;
@@ -84,7 +85,7 @@ export default function ShareModal({ book, currentUserUid, onClose }: Props) {
       >
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-900">
-            Delen — {book.name}
+            Delen: {book.name}
           </h2>
           <button
             onClick={onClose}
@@ -156,7 +157,7 @@ export default function ShareModal({ book, currentUserUid, onClose }: Props) {
         </div>
 
         <div className="mt-5 flex justify-end">
-          <button onClick={onClose} className="text-sm text-gray-500 hover:underline">
+          <button onClick={onClose} className={secondaryButtonClass}>
             Sluiten
           </button>
         </div>

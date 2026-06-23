@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Category } from '@/types';
+import { secondaryButtonClass } from '@/components/ui/buttonStyles';
 
 interface FormValues {
   amount: string;
@@ -175,7 +176,7 @@ export default function TransactionForm({ initial, onSubmit, submitLabel, catego
         <button
           type="button"
           onClick={() => router.back()}
-          className="text-sm text-gray-500 hover:underline"
+          className={secondaryButtonClass}
         >
           Annuleren
         </button>

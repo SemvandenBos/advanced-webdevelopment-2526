@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { secondaryButtonClass } from '@/components/ui/buttonStyles';
 
 interface Props {
   initialName?: string;
@@ -77,7 +78,7 @@ export default function HuishoudboekjeForm({
         <button
           type="button"
           onClick={() => router.back()}
-          className="text-sm text-gray-500 hover:underline"
+          className={secondaryButtonClass}
         >
           Annuleren
         </button>

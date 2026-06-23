@@ -31,7 +31,7 @@ describe('ShareModal', () => {
   describe('rendering', () => {
     it('renders a modal overlay', () => {
       render(<ShareModal {...defaultProps} />)
-      expect(screen.getByText(/delen — testboekje/i)).toBeInTheDocument()
+      expect(screen.getByText(/delen: testboekje/i)).toBeInTheDocument()
     })
 
     it('renders the email input and invite button', () => {
