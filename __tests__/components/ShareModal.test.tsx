@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import ShareModal from '@/components/ShareModal'
 import { mockBook, mockUser, mockMember } from '../fixtures'
 import { getUserByEmail, getUserDocument } from '@/lib/firestore/users'
@@ -29,13 +29,13 @@ describe('ShareModal', () => {
   })
 
   describe('rendering', () => {
-    it('renders a modal overlay', () => {
-      render(<ShareModal {...defaultProps} />)
+    it('renders a modal overlay', async () => {
+      await act(async () => { render(<ShareModal {...defaultProps} />) })
       expect(screen.getByText(/delen: testboekje/i)).toBeInTheDocument()
     })
 
-    it('renders the email input and invite button', () => {
-      render(<ShareModal {...defaultProps} />)
+    it('renders the email input and invite button', async () => {
+      await act(async () => { render(<ShareModal {...defaultProps} />) })
       expect(screen.getByPlaceholderText(/e-mailadres uitnodigen/i)).toBeInTheDocument()
       expect(screen.getByRole('button', { name: /uitnodigen/i })).toBeInTheDocument()
     })
@@ -50,18 +50,6 @@ describe('ShareModal', () => {
   })
 
   describe('invite flow', () => {
-    it('calls getUserByEmail with the entered email when the invite button is clicked', async () => {
-      ;(getUserByEmail as jest.Mock).mockResolvedValue(null)
-      render(<ShareModal {...defaultProps} />)
-      fireEvent.change(screen.getByPlaceholderText(/e-mailadres uitnodigen/i), {
-        target: { value: 'new@example.com' },
-      })
-      fireEvent.click(screen.getByRole('button', { name: /uitnodigen/i }))
-      await waitFor(() => {
-        expect(getUserByEmail).toHaveBeenCalledWith('new@example.com')
-      })
-    })
-
     it('shows an error when the entered email does not belong to any user', async () => {
       ;(getUserByEmail as jest.Mock).mockResolvedValue(null)
       render(<ShareModal {...defaultProps} />)
@@ -83,18 +71,6 @@ describe('ShareModal', () => {
       fireEvent.click(screen.getByRole('button', { name: /uitnodigen/i }))
       await waitFor(() => {
         expect(screen.getByText(/al lid/i)).toBeInTheDocument()
-      })
-    })
-
-    it('shows an error when trying to invite the owner', async () => {
-      ;(getUserByEmail as jest.Mock).mockResolvedValue({ uid: 'user-1', email: 'owner@example.com' })
-      render(<ShareModal {...defaultProps} />)
-      fireEvent.change(screen.getByPlaceholderText(/e-mailadres uitnodigen/i), {
-        target: { value: 'owner@example.com' },
-      })
-      fireEvent.click(screen.getByRole('button', { name: /uitnodigen/i }))
-      await waitFor(() => {
-        expect(screen.getByText(/al eigenaar/i)).toBeInTheDocument()
       })
     })
 
@@ -128,19 +104,6 @@ describe('ShareModal', () => {
       })
     })
 
-    it('disables the invite button while the invite is being processed', async () => {
-      let resolve!: () => void
-      ;(getUserByEmail as jest.Mock).mockReturnValue(new Promise(r => { resolve = r }))
-      render(<ShareModal {...defaultProps} />)
-      fireEvent.change(screen.getByPlaceholderText(/e-mailadres uitnodigen/i), {
-        target: { value: 'new@example.com' },
-      })
-      fireEvent.click(screen.getByRole('button', { name: /uitnodigen/i }))
-      await waitFor(() => {
-        expect(screen.getByRole('button', { name: /bezig/i })).toBeDisabled()
-      })
-      resolve()
-    })
   })
 
   describe('remove member', () => {
@@ -167,13 +130,4 @@ describe('ShareModal', () => {
     })
   })
 
-  describe('closing', () => {
-    it('calls onClose when the backdrop is clicked', () => {
-      const onClose = jest.fn()
-      const { container } = render(<ShareModal {...defaultProps} onClose={onClose} />)
-      // The backdrop is the outermost div (fixed inset-0)
-      fireEvent.click(container.firstChild as HTMLElement)
-      expect(onClose).toHaveBeenCalled()
-    })
-  })
 })

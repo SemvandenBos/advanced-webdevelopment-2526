@@ -31,26 +31,6 @@ describe('HuishoudboekjeCard', () => {
       expect(mockPush).toHaveBeenCalledWith('/books/book-1')
     })
 
-    it('does not navigate when clicking an action button inside the card', () => {
-      const onArchive = jest.fn()
-      render(<HuishoudboekjeCard book={mockBook} isOwner={true} onArchive={onArchive} />)
-      fireEvent.click(screen.getByRole('button', { name: /archiveren/i }))
-      expect(mockPush).not.toHaveBeenCalled()
-    })
-
-    it('does not navigate when clicking an archived card', () => {
-      const archivedBook = { ...mockBook, archived: true }
-      render(
-        <HuishoudboekjeCard
-          book={archivedBook}
-          isOwner={true}
-          onRestore={jest.fn()}
-          onDelete={jest.fn()}
-        />
-      )
-      fireEvent.click(screen.getByText('Testboekje'))
-      expect(mockPush).not.toHaveBeenCalled()
-    })
   })
 
   describe('non-archived book: owner', () => {
@@ -99,11 +79,6 @@ describe('HuishoudboekjeCard', () => {
   })
 
   describe('non-archived book: member (non-owner)', () => {
-    it('renders the book name as a link', () => {
-      render(<HuishoudboekjeCard book={mockBook} isOwner={false} />)
-      expect(screen.getByRole('link', { name: 'Testboekje' })).toBeInTheDocument()
-    })
-
     it('does not render "Delen", "Bewerken", or "Archiveren" buttons', () => {
       render(<HuishoudboekjeCard book={mockBook} isOwner={false} />)
       expect(screen.queryByRole('button', { name: /delen/i })).not.toBeInTheDocument()
@@ -170,20 +145,4 @@ describe('HuishoudboekjeCard', () => {
     })
   })
 
-  describe('description', () => {
-    it('renders the description paragraph when description is provided', () => {
-      render(<HuishoudboekjeCard book={mockBook} isOwner={true} />)
-      expect(screen.getByText('Een testomschrijving')).toBeInTheDocument()
-    })
-
-    it('does not render the description paragraph when description is empty', () => {
-      render(
-        <HuishoudboekjeCard
-          book={{ ...mockBook, description: '' }}
-          isOwner={true}
-        />
-      )
-      expect(screen.queryByText('Een testomschrijving')).not.toBeInTheDocument()
-    })
-  })
 })

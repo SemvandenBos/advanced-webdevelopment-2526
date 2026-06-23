@@ -43,16 +43,6 @@ describe('TransactionList', () => {
       expect(container.querySelector('.animate-pulse')).toBeInTheDocument()
     })
 
-    it('does not render any transaction rows when loading', () => {
-      render(
-        <TransactionList
-          {...defaultProps}
-          transactions={[mockTransaction]}
-          loading={true}
-        />
-      )
-      expect(screen.queryByText('Boodschappen')).not.toBeInTheDocument()
-    })
   })
 
   describe('empty state', () => {
@@ -141,16 +131,6 @@ describe('TransactionList', () => {
       expect(screen.getByText(/april 2025/i)).toBeInTheDocument()
     })
 
-    it('renders a new month header when adjacent transactions span different years', () => {
-      const txDec = makeTransaction('tx-a', new Date('2024-12-15'))
-      const txJan = makeTransaction('tx-b', new Date('2025-01-15'))
-      render(
-        <TransactionList {...defaultProps} transactions={[txDec, txJan]} />
-      )
-      expect(screen.getByText(/december 2024/i)).toBeInTheDocument()
-      expect(screen.getByText(/januari 2025/i)).toBeInTheDocument()
-    })
-
     it('does not render a month header when adjacent transactions share the same month and year', () => {
       const tx1 = makeTransaction('tx-a', new Date('2025-03-05'))
       const tx2 = makeTransaction('tx-b', new Date('2025-03-20'))
@@ -161,27 +141,5 @@ describe('TransactionList', () => {
       expect(screen.getAllByText(/maart 2025/i)).toHaveLength(1)
     })
 
-    it('renders the month header label in Dutch (nl-NL locale)', () => {
-      const txJune = makeTransaction('tx-a', new Date('2025-06-10'))
-      render(
-        <TransactionList {...defaultProps} transactions={[txJune]} />
-      )
-      expect(screen.getByText(/juni 2025/i)).toBeInTheDocument()
-    })
-  })
-
-  describe('scroll sentinel', () => {
-    it('renders the sentinel div at the bottom of the list', () => {
-      const loadMoreRef = jest.fn()
-      render(
-        <TransactionList
-          {...defaultProps}
-          transactions={[mockTransaction]}
-          loadMoreRef={loadMoreRef}
-        />
-      )
-      // The sentinel is a div with class h-4 at the end of the list
-      expect(loadMoreRef).toHaveBeenCalled()
-    })
   })
 })

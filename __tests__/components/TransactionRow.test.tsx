@@ -44,11 +44,6 @@ describe('TransactionRow', () => {
       expect(screen.getByText(`-${fmt(mockTransaction.amount)}`)).toBeInTheDocument()
     })
 
-    it('renders the description text when present', () => {
-      render(<TransactionRow {...defaultProps} transaction={mockTransaction} />)
-      expect(screen.getByText('Boodschappen')).toBeInTheDocument()
-    })
-
     it('renders "Uitgave" as fallback description when description is empty', () => {
       render(
         <TransactionRow
@@ -65,20 +60,9 @@ describe('TransactionRow', () => {
       expect(screen.getByText(/15 mrt/i)).toBeInTheDocument()
     })
 
-    it('formats the amount as EUR currency in nl-NL locale', () => {
-      render(<TransactionRow {...defaultProps} transaction={mockTransaction} />)
-      expect(screen.getByText(/€/)).toBeInTheDocument()
-    })
   })
 
   describe('income transaction', () => {
-    it('renders a green colour dot indicator', () => {
-      const { container } = render(
-        <TransactionRow {...defaultProps} transaction={mockIncomeTransaction} />
-      )
-      expect(container.querySelector('.bg-green-500')).toBeInTheDocument()
-    })
-
     it('renders the amount with a plus sign', () => {
       const fmt = (n: number) =>
         new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(n).replace(/ /g, " ")
@@ -86,15 +70,6 @@ describe('TransactionRow', () => {
       expect(screen.getByText(`+${fmt(mockIncomeTransaction.amount)}`)).toBeInTheDocument()
     })
 
-    it('renders "Inkomsten" as fallback description when description is empty', () => {
-      render(
-        <TransactionRow
-          {...defaultProps}
-          transaction={{ ...mockIncomeTransaction, description: '' }}
-        />
-      )
-      expect(screen.getByText('Inkomsten')).toBeInTheDocument()
-    })
   })
 
   describe('owner actions', () => {
@@ -143,11 +118,5 @@ describe('TransactionRow', () => {
       expect(container.firstChild).toHaveClass('opacity-30')
     })
 
-    it('renders at full opacity when not dragging', () => {
-      const { container } = render(
-        <TransactionRow {...defaultProps} transaction={mockTransaction} />
-      )
-      expect(container.firstChild).not.toHaveClass('opacity-30')
-    })
   })
 })

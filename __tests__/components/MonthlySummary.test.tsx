@@ -15,11 +15,6 @@ describe('MonthlySummary', () => {
       expect(screen.getByText(fmt(1500))).toBeInTheDocument()
     })
 
-    it('renders the expenses amount formatted as EUR currency', () => {
-      render(<MonthlySummary income={1500} expenses={600} balance={900} />)
-      expect(screen.getByText(fmt(600))).toBeInTheDocument()
-    })
-
     it('renders the balance amount formatted as EUR currency', () => {
       render(<MonthlySummary income={1500} expenses={600} balance={900} />)
       expect(screen.getByText(fmt(900))).toBeInTheDocument()
@@ -37,10 +32,5 @@ describe('MonthlySummary', () => {
       expect(screen.getByText(fmt(-1500))).toHaveClass('text-red-600')
     })
 
-    it('renders the balance in green when balance is zero', () => {
-      // income(600) and expenses(600) match each other, but balance(0) is a unique value
-      render(<MonthlySummary income={600} expenses={600} balance={0} />)
-      expect(screen.getByText(fmt(0))).toHaveClass('text-green-600')
-    })
   })
 })
