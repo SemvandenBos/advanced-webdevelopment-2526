@@ -62,7 +62,6 @@ describe('CategoryPanel', () => {
           spending={new Map()}
         />
       )
-      // 0 / 300 budget — the component renders "€ 0,00 / € 300,00"
       expect(screen.getByText(/0,00/)).toBeInTheDocument()
     })
   })
@@ -93,7 +92,7 @@ describe('CategoryPanel', () => {
       expect(card).not.toHaveClass('ring-2')
     })
 
-    it('passes isFiltering=true — non-selected categories fade when a filter is active', () => {
+    it('passes isFiltering=true: non-selected categories fade when a filter is active', () => {
       render(
         <CategoryPanel
           {...defaultProps}
@@ -106,7 +105,7 @@ describe('CategoryPanel', () => {
       expect(transportCard).toHaveClass('opacity-40', 'grayscale')
     })
 
-    it('passes isFiltering=false — no category is faded when selectedCategoryId is null', () => {
+    it('passes isFiltering=false: no category is faded when selectedCategoryId is null', () => {
       render(
         <CategoryPanel
           {...defaultProps}
