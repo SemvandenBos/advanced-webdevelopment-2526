@@ -13,6 +13,7 @@ const defaultProps = {
   onClick: jest.fn(),
   isSelected: false,
   isFiltering: false,
+  isOwner: true,
 }
 
 describe('CategoryCompact', () => {
@@ -49,9 +50,25 @@ describe('CategoryCompact', () => {
     expect(onClick).toHaveBeenCalledTimes(1)
   })
 
-  it('applies hover ring styles when a draggable is over the card', () => {
-    ;(useDroppable as jest.Mock).mockReturnValueOnce({ setNodeRef: jest.fn(), isOver: true })
-    const { container } = render(<CategoryCompact {...defaultProps} />)
-    expect(container.firstChild).toHaveClass('ring-2', 'ring-indigo-400', 'bg-indigo-50')
+  describe('drag-and-drop', () => {
+    it('applies hover ring styles when a draggable is over the card', () => {
+      ;(useDroppable as jest.Mock).mockReturnValueOnce({ setNodeRef: jest.fn(), isOver: true })
+      const { container } = render(<CategoryCompact {...defaultProps} />)
+      expect(container.firstChild).toHaveClass('ring-2', 'ring-indigo-400', 'bg-indigo-50')
+    })
+
+    it('passes disabled: false to useDroppable for the owner', () => {
+      render(<CategoryCompact {...defaultProps} />)
+      expect(useDroppable).toHaveBeenCalledWith(
+        expect.objectContaining({ disabled: false })
+      )
+    })
+
+    it('passes disabled: true to useDroppable for non-owners', () => {
+      render(<CategoryCompact {...defaultProps} isOwner={false} />)
+      expect(useDroppable).toHaveBeenCalledWith(
+        expect.objectContaining({ disabled: true })
+      )
+    })
   })
 })

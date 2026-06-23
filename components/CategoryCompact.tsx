@@ -9,13 +9,14 @@ interface Props {
   onClick: () => void;
   isSelected: boolean;
   isFiltering: boolean;
+  isOwner: boolean;
 }
 
 function fmt(amount: number) {
   return amount.toLocaleString('nl-NL', { style: 'currency', currency: 'EUR' });
 }
 
-export default function CategoryCompact({ category, spent, onClick, isSelected, isFiltering }: Props) {
+export default function CategoryCompact({ category, spent, onClick, isSelected, isFiltering, isOwner }: Props) {
   const pct = category.maxBudget > 0 ? (spent / category.maxBudget) * 100 : 0;
   const barPct = Math.min(pct, 100);
   const barColor = pct >= 100 ? 'bg-red-500' : pct >= 80 ? 'bg-yellow-400' : 'bg-green-500';
@@ -23,6 +24,7 @@ export default function CategoryCompact({ category, spent, onClick, isSelected, 
   const { setNodeRef, isOver } = useDroppable({
     id: `cat-drop-${category.id}`,
     data: { type: 'category', categoryId: category.id },
+    disabled: !isOwner,
   });
 
   const faded = isFiltering && !isSelected;

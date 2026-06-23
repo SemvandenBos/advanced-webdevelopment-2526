@@ -117,6 +117,5 @@ describe('TransactionRow', () => {
       )
       expect(container.firstChild).toHaveClass('opacity-30')
     })
-
   })
 })

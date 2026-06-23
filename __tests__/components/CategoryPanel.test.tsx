@@ -1,4 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react'
+import { useDroppable } from '@dnd-kit/core'
 import CategoryPanel from '@/components/CategoryPanel'
 import { mockCategory, mockCategory2 } from '../fixtures'
 
@@ -10,6 +11,7 @@ const defaultProps = {
   spending: new Map<string, number>(),
   selectedCategoryId: null,
   bookId: 'book-1',
+  isOwner: true,
   onSelect: jest.fn(),
 }
 
@@ -94,6 +96,22 @@ describe('CategoryPanel', () => {
       )
       fireEvent.click(screen.getByText('Boodschappen').closest('.rounded-lg')!)
       expect(onSelect).toHaveBeenCalledWith('cat-1')
+    })
+  })
+
+  describe('ownership', () => {
+    it('forwards isOwner=true to each CategoryCompact, enabling its drop target', () => {
+      render(<CategoryPanel {...defaultProps} categories={[mockCategory]} isOwner={true} />)
+      expect(useDroppable).toHaveBeenCalledWith(
+        expect.objectContaining({ disabled: false })
+      )
+    })
+
+    it('forwards isOwner=false to each CategoryCompact, disabling its drop target', () => {
+      render(<CategoryPanel {...defaultProps} categories={[mockCategory]} isOwner={false} />)
+      expect(useDroppable).toHaveBeenCalledWith(
+        expect.objectContaining({ disabled: true })
+      )
     })
   })
 })

@@ -150,6 +150,7 @@ export default function BookDetailPage() {
             spending={spending}
             selectedCategoryId={selectedCategoryId}
             bookId={id}
+            isOwner={isOwner}
             onSelect={(catId) => setSelectedCategoryId(prev => (prev === catId ? null : catId))}
           />
         </div>
