@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { secondaryButtonClass } from '@/components/ui/buttonStyles';
+import { isPastISODate } from '@/lib/dateUtils';
 
 interface FormValues {
   name: string;
@@ -44,6 +45,10 @@ export default function CategoryForm({ initial, onSubmit, submitLabel }: Props) 
     const maxBudget = parseFloat(form.maxBudget.replace(',', '.'));
     if (!form.maxBudget || isNaN(maxBudget) || maxBudget <= 0) {
       setError('Voer een geldig maximaal budget in (groter dan 0).');
+      return;
+    }
+    if (form.endDate && isPastISODate(form.endDate)) {
+      setError('Einddatum mag niet in het verleden liggen.');
       return;
     }
     setError('');

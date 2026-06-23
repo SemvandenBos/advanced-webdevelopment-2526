@@ -11,6 +11,7 @@ import { getHuishoudboekje } from '@/lib/firestore/huishoudboekjes';
 import { deleteTransaction, updateTransaction } from '@/lib/firestore/transactions';
 import { useInfiniteTransactions, useMonthlyChartData } from '@/hooks/useTransactions';
 import { useCategories, useCategorySpending } from '@/hooks/useCategories';
+import { isAfterCategoryEndDate, timestampToISO } from '@/lib/dateUtils';
 import { Huishoudboekje } from '@/types';
 import TransactionList from '@/components/TransactionList';
 import CategoryPanel from '@/components/CategoryPanel';
@@ -36,6 +37,7 @@ export default function BookDetailPage() {
   const [bookLoading, setBookLoading] = useState(true);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
   const [activeTxId, setActiveTxId] = useState<string | null>(null);
+  const [dragError, setDragError] = useState<string | null>(null);
 
   const { transactions, loadMore, loading: txLoading, hasMore } = useInfiniteTransactions(id);
   const { data: chartData } = useMonthlyChartData(id);
@@ -75,11 +77,18 @@ export default function BookDetailPage() {
 
   const handleDragEnd = (event: DragEndEvent) => {
     setActiveTxId(null);
+    setDragError(null);
     const { active, over } = event;
     if (!over) return;
     const a = active.data.current as { type: string; txId?: string } | undefined;
     const o = over.data.current as { type: string; categoryId?: string } | undefined;
     if (a?.type === 'transaction' && o?.type === 'category' && a.txId && o.categoryId) {
+      const tx = transactions.find(t => t.id === a.txId);
+      const category = categories.find(c => c.id === o.categoryId);
+      if (tx && category && isAfterCategoryEndDate(timestampToISO(tx.date), category.endDate)) {
+        setDragError(`Transactiedatum ligt na de einddatum van categorie "${category.name}".`);
+        return;
+      }
       updateTransaction(id, a.txId, { categoryId: o.categoryId });
     }
   };
@@ -128,6 +137,8 @@ export default function BookDetailPage() {
           )}
         </div>
       </div>
+
+      {dragError && <p className="text-sm text-red-600">{dragError}</p>}
 
       <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-start">
