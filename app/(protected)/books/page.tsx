@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useHuishoudboekjes } from '@/hooks/useHuishoudboekjes';
 import { useAuth } from '@/contexts/AuthContext';
-import HuishoudboekjeCard from '@/components/HuishoudboekjeCard';
+import HuishoudboekjeCard from '@/components/books/HuishoudboekjeCard';
 import { BooksListSkeleton } from '@/components/skeletons/BookCardSkeleton';
 import { archiveHuishoudboekje } from '@/lib/firestore/huishoudboekjes';
 import { secondaryButtonClass } from '@/components/ui/buttonStyles';
@@ -50,6 +50,7 @@ export default function BooksPage() {
                     <HuishoudboekjeCard
                       book={book}
                       isOwner={true}
+                      currentUserUid={user?.uid}
                       onArchive={handleArchive}
                     />
                   </li>

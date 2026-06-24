@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import { useDroppable } from '@dnd-kit/core'
-import CategoryCompact from '@/components/CategoryCompact'
+import CategoryCompact from '@/components/categories/CategoryCompact'
 import { mockCategory } from '../fixtures'
 
 jest.mock('@dnd-kit/core', () => ({

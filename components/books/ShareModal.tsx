@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Huishoudboekje, AppUser } from '@/types';
-import { getUserByEmail, getUserDocument } from '@/lib/firestore/users';
-import { addMember, removeMember } from '@/lib/firestore/huishoudboekjes';
+import { useState } from 'react';
+import { Huishoudboekje } from '@/types/models';
+import { useBookMembers } from '@/hooks/useBookMembers';
 import { secondaryButtonClass } from '@/components/ui/buttonStyles';
 
 interface Props {
@@ -14,64 +13,12 @@ interface Props {
 
 export default function ShareModal({ book, currentUserUid, onClose }: Props) {
   const [email, setEmail] = useState('');
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-  const [errorMessage, setErrorMessage] = useState('');
-  const [removingUid, setRemovingUid] = useState<string | null>(null);
-  const [memberDetails, setMemberDetails] = useState<AppUser[]>([]);
-
-  useEffect(() => {
-    if (book.members.length === 0) {
-      setMemberDetails([]);
-      return;
-    }
-    Promise.all(book.members.map(uid => getUserDocument(uid))).then(results => {
-      setMemberDetails(results.filter(Boolean) as AppUser[]);
-    });
-  }, [book.members]);
+  const { memberDetails, inviteStatus, inviteError, removingUid, invite, remove, resetInviteStatus } = useBookMembers(book);
 
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();
-    const trimmed = email.trim().toLowerCase();
-    if (!trimmed) return;
-
-    setStatus('loading');
-    setErrorMessage('');
-
-    try {
-      const found = await getUserByEmail(trimmed);
-
-      if (!found) {
-        setStatus('error');
-        setErrorMessage('Geen gebruiker gevonden met dit e-mailadres.');
-        return;
-      }
-      if (found.uid === book.ownerUid) {
-        setStatus('error');
-        setErrorMessage('Deze gebruiker is al eigenaar van dit boekje.');
-        return;
-      }
-      if (book.members.includes(found.uid)) {
-        setStatus('error');
-        setErrorMessage('Deze gebruiker is al lid van dit boekje.');
-        return;
-      }
-
-      await addMember(book.id, found.uid);
-      setEmail('');
-      setStatus('success');
-    } catch {
-      setStatus('error');
-      setErrorMessage('Er is iets misgegaan. Probeer het opnieuw.');
-    }
-  };
-
-  const handleRemove = async (uid: string) => {
-    setRemovingUid(uid);
-    try {
-      await removeMember(book.id, uid);
-    } finally {
-      setRemovingUid(null);
-    }
+    const success = await invite(email);
+    if (success) setEmail('');
   };
 
   return (
@@ -102,25 +49,25 @@ export default function ShareModal({ book, currentUserUid, onClose }: Props) {
             value={email}
             onChange={e => {
               setEmail(e.target.value);
-              if (status !== 'idle') setStatus('idle');
+              if (inviteStatus !== 'idle') resetInviteStatus();
             }}
             placeholder="E-mailadres uitnodigen"
             className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            disabled={status === 'loading'}
+            disabled={inviteStatus === 'loading'}
           />
           <button
             type="submit"
-            disabled={status === 'loading' || !email.trim()}
+            disabled={inviteStatus === 'loading' || !email.trim()}
             className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors shrink-0"
           >
-            {status === 'loading' ? 'Bezig...' : 'Uitnodigen'}
+            {inviteStatus === 'loading' ? 'Bezig...' : 'Uitnodigen'}
           </button>
         </form>
 
-        {status === 'error' && (
-          <p className="text-sm text-red-600 mb-3">{errorMessage}</p>
+        {inviteStatus === 'error' && (
+          <p className="text-sm text-red-600 mb-3">{inviteError}</p>
         )}
-        {status === 'success' && (
+        {inviteStatus === 'success' && (
           <p className="text-sm text-green-600 mb-3">Gebruiker succesvol toegevoegd.</p>
         )}
 
@@ -143,7 +90,7 @@ export default function ShareModal({ book, currentUserUid, onClose }: Props) {
                   </div>
                   {member.uid !== currentUserUid && (
                     <button
-                      onClick={() => handleRemove(member.uid)}
+                      onClick={() => remove(member.uid)}
                       disabled={removingUid === member.uid}
                       className="text-red-500 hover:text-red-700 disabled:opacity-50 text-xs shrink-0 ml-3"
                     >

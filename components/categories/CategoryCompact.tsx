@@ -1,7 +1,8 @@
 'use client';
 
 import { useDroppable } from '@dnd-kit/core';
-import { Category } from '@/types';
+import { Category } from '@/types/models';
+import { formatCurrency } from '@/lib/formatUtils';
 
 interface Props {
   category: Category;
@@ -10,10 +11,6 @@ interface Props {
   isSelected: boolean;
   isFiltering: boolean;
   isOwner: boolean;
-}
-
-function fmt(amount: number) {
-  return amount.toLocaleString('nl-NL', { style: 'currency', currency: 'EUR' });
 }
 
 export default function CategoryCompact({ category, spent, onClick, isSelected, isFiltering, isOwner }: Props) {
@@ -58,7 +55,7 @@ export default function CategoryCompact({ category, spent, onClick, isSelected, 
       </div>
 
       <p className="text-xs text-gray-400">
-        {fmt(spent)} / {fmt(category.maxBudget)}
+        {formatCurrency(spent)} / {formatCurrency(category.maxBudget)}
       </p>
     </div>
   );

@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Category } from '@/types';
+import { Category } from '@/types/models';
 import { secondaryButtonClass } from '@/components/ui/buttonStyles';
+import { todayISO, isAfterCategoryEndDate } from '@/lib/dateUtils';
 
 interface FormValues {
   amount: string;
@@ -26,11 +27,6 @@ interface Props {
   onSubmit: (data: SubmitData) => Promise<void>;
   submitLabel: string;
   categories?: Category[];
-}
-
-function todayISO() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
 export default function TransactionForm({ initial, onSubmit, submitLabel, categories }: Props) {
@@ -57,6 +53,11 @@ export default function TransactionForm({ initial, onSubmit, submitLabel, catego
     }
     if (!form.date) {
       setError('Datum is verplicht.');
+      return;
+    }
+    const selectedCategory = categories?.find(cat => cat.id === form.categoryId);
+    if (isAfterCategoryEndDate(form.date, selectedCategory?.endDate)) {
+      setError('Datum mag niet na de einddatum van de categorie liggen.');
       return;
     }
     setError('');

@@ -1,9 +1,9 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useMemo } from 'react';
 import { subscribeCategories } from '@/lib/firestore/categories';
 import { subscribeAllTransactions } from '@/lib/firestore/transactions';
-import { Category } from '@/types';
+import { Category } from '@/types/models';
 
 export function useCategories(bookId: string) {
   const [categories, setCategories] = useState<Category[]>([]);

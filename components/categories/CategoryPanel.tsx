@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { Category } from '@/types';
-import CategoryCompact from '@/components/CategoryCompact';
+import { Category } from '@/types/models';
+import CategoryCompact from '@/components/categories/CategoryCompact';
 
 interface Props {
   categories: Category[];

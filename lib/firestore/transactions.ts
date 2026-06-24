@@ -1,4 +1,4 @@
-import {
+﻿import {
   collection,
   doc,
   getDoc,
@@ -14,7 +14,7 @@ import {
   type Unsubscribe,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { Transaction } from '@/types';
+import { Transaction } from '@/types/models';
 
 function txCol(bookId: string) {
   return collection(db, 'huishoudboekjes', bookId, 'transactions');

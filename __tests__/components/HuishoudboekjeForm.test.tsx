@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import HuishoudboekjeForm from '@/components/HuishoudboekjeForm'
+import HuishoudboekjeForm from '@/components/books/HuishoudboekjeForm'
 
 jest.mock('next/navigation', () => ({
   useRouter: () => ({ back: jest.fn() }),

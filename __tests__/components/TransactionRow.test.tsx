@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import { useDraggable } from '@dnd-kit/core'
-import TransactionRow from '@/components/TransactionRow'
+import TransactionRow from '@/components/transactions/TransactionRow'
 import { mockTransaction, mockIncomeTransaction } from '../fixtures'
 
 jest.mock('@dnd-kit/core', () => ({

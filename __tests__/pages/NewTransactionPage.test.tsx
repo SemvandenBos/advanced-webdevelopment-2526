@@ -22,7 +22,7 @@ jest.mock('@/lib/firestore/transactions', () => ({
 jest.mock('@/hooks/useCategories', () => ({
   useCategories: () => ({ categories: [] }),
 }))
-jest.mock('@/components/TransactionForm', () => ({
+jest.mock('@/components/transactions/TransactionForm', () => ({
   __esModule: true,
   default: ({ onSubmit }: { onSubmit: (data: object) => void }) => (
     <button

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useArchivedHuishoudboekjes } from '@/hooks/useHuishoudboekjes';
 import { useAuth } from '@/contexts/AuthContext';
-import HuishoudboekjeCard from '@/components/HuishoudboekjeCard';
+import HuishoudboekjeCard from '@/components/books/HuishoudboekjeCard';
 import { BooksListSkeleton } from '@/components/skeletons/BookCardSkeleton';
 import { restoreHuishoudboekje, deleteHuishoudboekje } from '@/lib/firestore/huishoudboekjes';
 import { secondaryButtonClass } from '@/components/ui/buttonStyles';

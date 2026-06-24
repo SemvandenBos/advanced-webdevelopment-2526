@@ -7,8 +7,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getTransaction, updateTransaction } from '@/lib/firestore/transactions';
 import { getHuishoudboekje } from '@/lib/firestore/huishoudboekjes';
 import { secondaryButtonClass } from '@/components/ui/buttonStyles';
-import TransactionForm from '@/components/TransactionForm';
-import { Transaction } from '@/types';
+import TransactionForm from '@/components/transactions/TransactionForm';
+import { Transaction } from '@/types/models';
 import { useCategories } from '@/hooks/useCategories';
 
 export default function EditTransactionPage() {
