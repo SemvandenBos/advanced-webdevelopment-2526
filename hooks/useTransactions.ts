@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { subscribeTransactions, subscribeAllTransactions } from '@/lib/firestore/transactions';
 import { Transaction } from '@/types/models';
 
@@ -30,55 +30,35 @@ export function useTransactions(bookId: string, year: number, month: number) {
   return { transactions, loading, summary };
 }
 
-const MAX_MONTHS = 24;
+const PAGE_SIZE = 20;
 
 export function useInfiniteTransactions(bookId: string) {
-  const [months, setMonths] = useState<{ year: number; month: number }[]>(() => {
-    const now = new Date();
-    return [{ year: now.getFullYear(), month: now.getMonth() }];
-  });
-  const [transactionsByMonth, setTransactionsByMonth] = useState<Map<string, Transaction[]>>(new Map());
-  const unsubscribersRef = useRef<(() => void)[]>([]);
+  const [allTransactions, setAllTransactions] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
-  // Subscribe only to the newest month each time one is added
   useEffect(() => {
-    const { year, month } = months[months.length - 1];
-    const key = `${year}-${String(month).padStart(2, '0')}`;
-    const unsub = subscribeTransactions(bookId, year, month, data => {
-      setTransactionsByMonth(prev => {
-        const next = new Map(prev);
-        next.set(key, data);
-        return next;
-      });
+    setLoading(true);
+    setVisibleCount(PAGE_SIZE);
+    const unsub = subscribeAllTransactions(bookId, data => {
+      setAllTransactions(data);
+      setLoading(false);
     });
-    unsubscribersRef.current.push(unsub);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [months.length]);
+    return unsub;
+  }, [bookId]);
 
-  useEffect(() => {
-    return () => { unsubscribersRef.current.forEach(unsub => unsub()); };
-  }, []);
-
-  const transactions = useMemo(
-    () =>
-      Array.from(transactionsByMonth.values())
-        .flat()
-        .sort((a, b) => b.date.toMillis() - a.date.toMillis()),
-    [transactionsByMonth],
+  const sorted = useMemo(
+    () => [...allTransactions].sort((a, b) => b.date.toMillis() - a.date.toMillis()),
+    [allTransactions],
   );
 
-  const hasMore = months.length < MAX_MONTHS;
+  const transactions = useMemo(() => sorted.slice(0, visibleCount), [sorted, visibleCount]);
+
+  const hasMore = visibleCount < sorted.length;
 
   const loadMore = useCallback(() => {
-    if (!hasMore) return;
-    setMonths(prev => {
-      const { year, month } = prev[prev.length - 1];
-      const d = new Date(year, month - 1);
-      return [...prev, { year: d.getFullYear(), month: d.getMonth() }];
-    });
-  }, [hasMore]);
-
-  const loading = transactionsByMonth.size === 0;
+    setVisibleCount(prev => prev + PAGE_SIZE);
+  }, []);
 
   return { transactions, loadMore, loading, hasMore };
 }
