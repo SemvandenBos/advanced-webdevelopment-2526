@@ -25,7 +25,7 @@ export function subscribeCategories(
 ): Unsubscribe {
   return onSnapshot(
     query(catCol(bookId), orderBy('createdAt', 'asc')),
-    snap => onData(snap.docs.map(d => ({ id: d.id, ...d.data() } as Category)))
+    snap => onData(snap.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() } as Category)))
   );
 }
 

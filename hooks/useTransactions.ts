@@ -56,7 +56,7 @@ export function useInfiniteTransactions(bookId: string) {
   }, [months.length]);
 
   useEffect(() => {
-    return () => { unsubscribersRef.current.forEach(u => u()); };
+    return () => { unsubscribersRef.current.forEach(unsub => unsub()); };
   }, []);
 
   const transactions = useMemo(
