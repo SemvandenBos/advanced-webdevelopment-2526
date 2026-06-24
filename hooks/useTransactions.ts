@@ -76,9 +76,10 @@ export function useMonthlyChartData(bookId: string) {
   useEffect(() => {
     const unsub = subscribeAllTransactions(bookId, txs => {
       const map = new Map<string, MonthlyTotal>();
+      const anchor = txs.length > 0 ? txs[txs.length - 1].date.toDate() : new Date();
 
       for (let i = 5; i >= 0; i--) {
-        const d = new Date();
+        const d = new Date(anchor);
         d.setMonth(d.getMonth() - i);
         const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2, '0')}`;
         const label = d.toLocaleDateString('nl-NL', { month: 'short', year: '2-digit' });
