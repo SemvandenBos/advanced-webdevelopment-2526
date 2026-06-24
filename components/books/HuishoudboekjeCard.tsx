@@ -4,22 +4,21 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Huishoudboekje } from '@/types/models';
-import { useAuth } from '@/contexts/AuthContext';
 import ShareModal from '@/components/books/ShareModal';
 import { secondaryButtonClass, dangerButtonClass, accentButtonClass } from '@/components/ui/buttonStyles';
 
 interface Props {
   book: Huishoudboekje;
   isOwner: boolean;
+  currentUserUid?: string;
   onArchive?: (id: string) => void;
   onRestore?: (id: string) => void;
   onDelete?: (id: string) => void;
 }
 
-export default function HuishoudboekjeCard({ book, isOwner, onArchive, onRestore, onDelete }: Props) {
+export default function HuishoudboekjeCard({ book, isOwner, currentUserUid, onArchive, onRestore, onDelete }: Props) {
   const isArchived = !!onRestore;
   const [shareOpen, setShareOpen] = useState(false);
-  const { user } = useAuth();
   const router = useRouter();
 
   const handleCardClick = () => {
@@ -100,10 +99,10 @@ export default function HuishoudboekjeCard({ book, isOwner, onArchive, onRestore
         )}
       </div>
     </div>
-    {shareOpen && user && (
+    {shareOpen && currentUserUid && (
       <ShareModal
         book={book}
-        currentUserUid={user.uid}
+        currentUserUid={currentUserUid}
         onClose={() => setShareOpen(false)}
       />
     )}

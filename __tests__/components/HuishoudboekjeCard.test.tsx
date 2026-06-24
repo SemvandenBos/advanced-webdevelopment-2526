@@ -70,7 +70,7 @@ describe('HuishoudboekjeCard', () => {
     })
 
     it('opens the ShareModal when "Delen" is clicked', async () => {
-      render(<HuishoudboekjeCard book={mockBook} isOwner={true} />)
+      render(<HuishoudboekjeCard book={mockBook} isOwner={true} currentUserUid={mockUser.uid} />)
       fireEvent.click(screen.getByRole('button', { name: /delen/i }))
       await waitFor(() => {
         expect(screen.getByText(/delen: testboekje/i)).toBeInTheDocument()

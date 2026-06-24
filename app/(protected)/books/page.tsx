@@ -50,6 +50,7 @@ export default function BooksPage() {
                     <HuishoudboekjeCard
                       book={book}
                       isOwner={true}
+                      currentUserUid={user?.uid}
                       onArchive={handleArchive}
                     />
                   </li>

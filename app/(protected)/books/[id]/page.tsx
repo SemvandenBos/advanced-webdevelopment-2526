@@ -4,14 +4,14 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { DndContext, DragEndEvent, DragStartEvent, DragOverlay, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { DndContext, DragOverlay } from '@dnd-kit/core';
 import { useInView } from 'react-intersection-observer';
 import { useAuth } from '@/contexts/AuthContext';
 import { getHuishoudboekje } from '@/lib/firestore/huishoudboekjes';
-import { deleteTransaction, updateTransaction } from '@/lib/firestore/transactions';
+import { deleteTransaction } from '@/lib/firestore/transactions';
 import { useInfiniteTransactions, useMonthlyChartData } from '@/hooks/useTransactions';
 import { useCategories, useCategorySpending } from '@/hooks/useCategories';
-import { isAfterCategoryEndDate, timestampToISO } from '@/lib/dateUtils';
+import { useTransactionDrag } from '@/hooks/useTransactionDrag';
 import { Huishoudboekje } from '@/types/models';
 import TransactionList from '@/components/transactions/TransactionList';
 import CategoryPanel from '@/components/categories/CategoryPanel';
@@ -36,8 +36,6 @@ export default function BookDetailPage() {
   const [book, setBook] = useState<Huishoudboekje | null>(null);
   const [bookLoading, setBookLoading] = useState(true);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
-  const [activeTxId, setActiveTxId] = useState<string | null>(null);
-  const [dragError, setDragError] = useState<string | null>(null);
 
   const { transactions, loadMore, loading: txLoading, hasMore } = useInfiniteTransactions(id);
   const { data: chartData } = useMonthlyChartData(id);
@@ -45,10 +43,7 @@ export default function BookDetailPage() {
   const { spending } = useCategorySpending(id);
 
   const { ref: sentinelRef, inView } = useInView({ threshold: 0 });
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-  );
+  const { sensors, activeTx, dragError, handleDragStart, handleDragEnd } = useTransactionDrag(id, transactions, categories);
 
   useEffect(() => {
     getHuishoudboekje(id).then(data => {
@@ -70,29 +65,6 @@ export default function BookDetailPage() {
     await deleteTransaction(id, txId);
   };
 
-  const handleDragStart = (event: DragStartEvent) => {
-    const data = event.active.data.current as { type: string; txId?: string } | undefined;
-    if (data?.type === 'transaction') setActiveTxId(data.txId ?? null);
-  };
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    setActiveTxId(null);
-    setDragError(null);
-    const { active, over } = event;
-    if (!over) return;
-    const a = active.data.current as { type: string; txId?: string } | undefined;
-    const o = over.data.current as { type: string; categoryId?: string } | undefined;
-    if (a?.type === 'transaction' && o?.type === 'category' && a.txId && o.categoryId) {
-      const tx = transactions.find(t => t.id === a.txId);
-      const category = categories.find(c => c.id === o.categoryId);
-      if (tx && category && isAfterCategoryEndDate(timestampToISO(tx.date), category.endDate)) {
-        setDragError(`Transactiedatum ligt na de einddatum van categorie "${category.name}".`);
-        return;
-      }
-      updateTransaction(id, a.txId, { categoryId: o.categoryId });
-    }
-  };
-
   if (bookLoading) {
     return <p className="text-sm text-gray-400">Laden...</p>;
   }
@@ -103,8 +75,6 @@ export default function BookDetailPage() {
   const displayed = selectedCategoryId
     ? transactions.filter(tx => tx.categoryId === selectedCategoryId)
     : transactions;
-
-  const activeTx = activeTxId ? transactions.find(t => t.id === activeTxId) ?? null : null;
 
   return (
     <div className="space-y-6">
