@@ -145,13 +145,13 @@ export default function BookDetailPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-white border border-gray-200 rounded-lg p-5">
             <h2 className="text-sm font-semibold text-gray-700 mb-4">
-              Inkomsten vs uitgaven laatste 6 maanden
+              Inkomsten vs uitgaven laatste 6 maanden met transacties
             </h2>
             <MonthlyBarChart data={chartData} />
           </div>
           <div className="bg-white border border-gray-200 rounded-lg p-5">
             <h2 className="text-sm font-semibold text-gray-700 mb-4">
-              Verloop laatste 6 maanden
+              Verloop laatste 6 maanden met transacties
             </h2>
             <MonthlyLineChart data={chartData} />
           </div>
