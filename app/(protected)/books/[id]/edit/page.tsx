@@ -3,9 +3,9 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import HuishoudboekjeForm from '@/components/HuishoudboekjeForm';
+import HuishoudboekjeForm from '@/components/books/HuishoudboekjeForm';
 import { getHuishoudboekje, updateHuishoudboekje } from '@/lib/firestore/huishoudboekjes';
-import { Huishoudboekje } from '@/types';
+import { Huishoudboekje } from '@/types/models';
 
 export default function EditBookPage() {
   const { id } = useParams<{ id: string }>();

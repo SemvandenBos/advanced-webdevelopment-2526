@@ -1,6 +1,7 @@
 'use client';
 
-import { Transaction } from '@/types';
+import { Transaction } from '@/types/models';
+import { formatCurrency } from '@/lib/formatUtils';
 
 interface Props {
   transaction: Transaction;
@@ -15,7 +16,7 @@ export default function TransactionDragPreview({ transaction }: Props) {
         {transaction.description || (isIncome ? 'Inkomsten' : 'Uitgave')}
       </p>
       <span className={`text-sm font-semibold shrink-0 ${isIncome ? 'text-green-600' : 'text-red-600'}`}>
-        {isIncome ? '+' : '-'}{new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(transaction.amount)}
+        {isIncome ? '+' : '-'}{formatCurrency(transaction.amount)}
       </span>
     </div>
   );

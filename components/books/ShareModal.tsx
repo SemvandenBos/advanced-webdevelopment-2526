@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Huishoudboekje, AppUser } from '@/types';
+import { Huishoudboekje, AppUser } from '@/types/models';
 import { getUserByEmail, getUserDocument } from '@/lib/firestore/users';
 import { addMember, removeMember } from '@/lib/firestore/huishoudboekjes';
 import { secondaryButtonClass } from '@/components/ui/buttonStyles';

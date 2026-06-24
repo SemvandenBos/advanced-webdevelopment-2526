@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Huishoudboekje } from '@/types';
+import { Huishoudboekje } from '@/types/models';
 import { useAuth } from '@/contexts/AuthContext';
-import ShareModal from '@/components/ShareModal';
+import ShareModal from '@/components/books/ShareModal';
 import { secondaryButtonClass, dangerButtonClass, accentButtonClass } from '@/components/ui/buttonStyles';
 
 interface Props {

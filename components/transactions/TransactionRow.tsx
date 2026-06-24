@@ -1,17 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { Timestamp } from 'firebase/firestore';
 import { useDraggable } from '@dnd-kit/core';
-import { Transaction } from '@/types';
-
-function fmt(n: number) {
-  return new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(n);
-}
-
-function fmtDate(ts: Timestamp) {
-  return ts.toDate().toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' });
-}
+import { Transaction } from '@/types/models';
+import { formatCurrency, formatTransactionDate } from '@/lib/formatUtils';
 
 interface Props {
   transaction: Transaction;
@@ -47,7 +39,7 @@ export default function TransactionRow({ transaction: tx, bookId, onDelete, isOw
         <p className="text-sm text-gray-800 truncate">
           {tx.description || (isIncome ? 'Inkomsten' : 'Uitgave')}
         </p>
-        <p className="text-xs text-gray-400 mt-0.5">{fmtDate(tx.date)}</p>
+        <p className="text-xs text-gray-400 mt-0.5">{formatTransactionDate(tx.date)}</p>
       </div>
       {isOwner && (
         <div className="flex items-center gap-3 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -67,7 +59,7 @@ export default function TransactionRow({ transaction: tx, bookId, onDelete, isOw
         </div>
       )}
       <span className={`text-sm font-semibold shrink-0 ${isIncome ? 'text-green-600' : 'text-red-600'}`}>
-        {isIncome ? '+' : '-'}{fmt(tx.amount)}
+        {isIncome ? '+' : '-'}{formatCurrency(tx.amount)}
       </span>
     </div>
   );

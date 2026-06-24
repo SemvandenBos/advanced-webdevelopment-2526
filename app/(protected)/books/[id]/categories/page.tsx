@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getHuishoudboekje } from '@/lib/firestore/huishoudboekjes';
 import { useCategories, useCategorySpending } from '@/hooks/useCategories';
 import { deleteCategory } from '@/lib/firestore/categories';
-import CategoryCard from '@/components/CategoryCard';
+import CategoryCard from '@/components/categories/CategoryCard';
 import { secondaryButtonClass } from '@/components/ui/buttonStyles';
 
 export default function CategoriesPage() {

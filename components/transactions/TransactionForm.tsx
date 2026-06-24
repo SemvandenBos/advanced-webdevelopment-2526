@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Category } from '@/types';
+import { Category } from '@/types/models';
 import { secondaryButtonClass } from '@/components/ui/buttonStyles';
 import { todayISO, isAfterCategoryEndDate } from '@/lib/dateUtils';
 

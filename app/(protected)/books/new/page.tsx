@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import HuishoudboekjeForm from '@/components/HuishoudboekjeForm';
+import HuishoudboekjeForm from '@/components/books/HuishoudboekjeForm';
 import { createHuishoudboekje } from '@/lib/firestore/huishoudboekjes';
 
 export default function NewBookPage() {

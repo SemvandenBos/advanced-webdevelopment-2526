@@ -12,10 +12,10 @@ import { deleteTransaction, updateTransaction } from '@/lib/firestore/transactio
 import { useInfiniteTransactions, useMonthlyChartData } from '@/hooks/useTransactions';
 import { useCategories, useCategorySpending } from '@/hooks/useCategories';
 import { isAfterCategoryEndDate, timestampToISO } from '@/lib/dateUtils';
-import { Huishoudboekje } from '@/types';
-import TransactionList from '@/components/TransactionList';
-import CategoryPanel from '@/components/CategoryPanel';
-import TransactionDragPreview from '@/components/TransactionDragPreview';
+import { Huishoudboekje } from '@/types/models';
+import TransactionList from '@/components/transactions/TransactionList';
+import CategoryPanel from '@/components/categories/CategoryPanel';
+import TransactionDragPreview from '@/components/transactions/TransactionDragPreview';
 import { secondaryButtonClass } from '@/components/ui/buttonStyles';
 
 const MonthlyLineChart = dynamic(
