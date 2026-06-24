@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import LoginForm from '@/components/LoginForm'
+import LoginForm from '@/components/auth/LoginForm'
 import { signInWithEmail, signUpWithEmail, signInWithGoogle } from '@/lib/auth'
 import { FirebaseError } from 'firebase/app'
 

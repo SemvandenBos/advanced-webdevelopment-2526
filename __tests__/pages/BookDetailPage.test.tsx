@@ -44,15 +44,15 @@ jest.mock('@dnd-kit/core', () => ({
   useSensors: jest.fn(() => []),
 }))
 jest.mock('next/dynamic', () => (_fn: unknown) => () => null)
-jest.mock('@/components/TransactionList', () => ({
+jest.mock('@/components/transactions/TransactionList', () => ({
   __esModule: true,
   default: () => <div data-testid="transaction-list" />,
 }))
-jest.mock('@/components/CategoryPanel', () => ({
+jest.mock('@/components/categories/CategoryPanel', () => ({
   __esModule: true,
   default: () => <div data-testid="category-panel" />,
 }))
-jest.mock('@/components/TransactionDragPreview', () => ({
+jest.mock('@/components/transactions/TransactionDragPreview', () => ({
   __esModule: true,
   default: () => null,
 }))

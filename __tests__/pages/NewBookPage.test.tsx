@@ -13,7 +13,7 @@ jest.mock('@/contexts/AuthContext', () => ({
 jest.mock('@/lib/firestore/huishoudboekjes', () => ({
   createHuishoudboekje: jest.fn().mockResolvedValue(undefined),
 }))
-jest.mock('@/components/HuishoudboekjeForm', () => ({
+jest.mock('@/components/books/HuishoudboekjeForm', () => ({
   __esModule: true,
   default: ({ onSubmit }: { onSubmit: (name: string, description: string) => void }) => (
     <button onClick={() => onSubmit('Testboekje', 'Omschrijving')}>Aanmaken</button>

@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import TransactionDragPreview from '@/components/TransactionDragPreview'
+import TransactionDragPreview from '@/components/transactions/TransactionDragPreview'
 import { mockTransaction, mockIncomeTransaction } from '../fixtures'
 
 describe('TransactionDragPreview', () => {

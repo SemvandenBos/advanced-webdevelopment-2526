@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import HuishoudboekjeCard from '@/components/HuishoudboekjeCard'
+import HuishoudboekjeCard from '@/components/books/HuishoudboekjeCard'
 import { mockBook, mockUser } from '../fixtures'
 
 jest.mock('@/contexts/AuthContext', () => ({

@@ -1,7 +1,7 @@
-import { render, screen } from '@testing-library/react'
-import TransactionList from '@/components/TransactionList'
+﻿import { render, screen } from '@testing-library/react'
+import TransactionList from '@/components/transactions/TransactionList'
 import { mockTransaction, mockIncomeTransaction, ts } from '../fixtures'
-import { Transaction } from '@/types'
+import { Transaction } from '@/types/models'
 
 jest.mock('@dnd-kit/core', () => ({
   useDraggable: jest.fn().mockReturnValue({

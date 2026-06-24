@@ -5,7 +5,7 @@ const mockPush = jest.fn()
 jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
 }))
-jest.mock('@/components/LoginForm', () => ({
+jest.mock('@/components/auth/LoginForm', () => ({
   __esModule: true,
   default: ({ onSuccess }: { onSuccess: () => void }) => (
     <button onClick={onSuccess}>Inloggen</button>

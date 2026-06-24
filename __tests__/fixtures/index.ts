@@ -1,4 +1,4 @@
-import { Huishoudboekje, Transaction, Category, AppUser } from '@/types'
+﻿import { Huishoudboekje, Transaction, Category, AppUser } from '@/types/models'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const ts = (date: Date): any => ({ toDate: () => date })

@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import Navbar from '@/components/Navbar'
+import Navbar from '@/components/layout/Navbar'
 import { mockUser } from '../fixtures'
 import { signOut } from '@/lib/auth'
 import { useAuth } from '@/contexts/AuthContext'

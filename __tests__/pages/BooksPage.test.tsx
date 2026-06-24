@@ -12,7 +12,7 @@ jest.mock('@/contexts/AuthContext', () => ({
 jest.mock('@/lib/firestore/huishoudboekjes', () => ({
   archiveHuishoudboekje: jest.fn(),
 }))
-jest.mock('@/components/HuishoudboekjeCard', () => ({
+jest.mock('@/components/books/HuishoudboekjeCard', () => ({
   __esModule: true,
   default: ({ book }: { book: { name: string } }) => (
     <div data-testid="book-card">{book.name}</div>

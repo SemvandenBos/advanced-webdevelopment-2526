@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react'
-import CategoryCard from '@/components/CategoryCard'
+import CategoryCard from '@/components/categories/CategoryCard'
 import { mockCategory } from '../fixtures'
 
 const defaultProps = {

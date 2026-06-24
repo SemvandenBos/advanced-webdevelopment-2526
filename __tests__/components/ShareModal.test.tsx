@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
-import ShareModal from '@/components/ShareModal'
+import ShareModal from '@/components/books/ShareModal'
 import { mockBook, mockUser, mockMember } from '../fixtures'
 import { getUserByEmail, getUserDocument } from '@/lib/firestore/users'
 import { addMember, removeMember } from '@/lib/firestore/huishoudboekjes'

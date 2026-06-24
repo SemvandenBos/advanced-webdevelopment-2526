@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import CategoryForm from '@/components/CategoryForm'
+import CategoryForm from '@/components/categories/CategoryForm'
 
 jest.mock('next/navigation', () => ({
   useRouter: () => ({ back: jest.fn() }),
