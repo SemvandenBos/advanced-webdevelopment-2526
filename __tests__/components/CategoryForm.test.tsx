@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import CategoryForm from '@/components/CategoryForm'
+import CategoryForm from '@/components/categories/CategoryForm'
 
 jest.mock('next/navigation', () => ({
   useRouter: () => ({ back: jest.fn() }),
@@ -28,12 +28,12 @@ describe('CategoryForm', () => {
       render(
         <CategoryForm
           {...defaultProps}
-          initial={{ name: 'Transport', maxBudget: '150', endDate: '2025-12-31' }}
+          initial={{ name: 'Transport', maxBudget: '150', endDate: '2027-12-31' }}
         />
       )
       expect(screen.getByDisplayValue('Transport')).toBeInTheDocument()
       expect(screen.getByDisplayValue('150')).toBeInTheDocument()
-      expect(screen.getByDisplayValue('2025-12-31')).toBeInTheDocument()
+      expect(screen.getByDisplayValue('2027-12-31')).toBeInTheDocument()
     })
   })
 
@@ -92,12 +92,12 @@ describe('CategoryForm', () => {
       })
       fireEvent.change(screen.getByRole('spinbutton'), { target: { value: '100' } })
       fireEvent.change(container.querySelector('[type="date"]')!, {
-        target: { value: '2025-12-31' },
+        target: { value: '2027-12-31' },
       })
       fireEvent.click(screen.getByRole('button', { name: 'Opslaan' }))
       await waitFor(() => {
         expect(onSubmit).toHaveBeenCalledWith(
-          expect.objectContaining({ endDate: new Date('2025-12-31') })
+          expect.objectContaining({ endDate: new Date('2027-12-31') })
         )
       })
     })

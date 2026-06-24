@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import HuishoudboekjeCard from '@/components/HuishoudboekjeCard'
+import HuishoudboekjeCard from '@/components/books/HuishoudboekjeCard'
 import { mockBook, mockUser } from '../fixtures'
 
 jest.mock('@/contexts/AuthContext', () => ({
@@ -70,7 +70,7 @@ describe('HuishoudboekjeCard', () => {
     })
 
     it('opens the ShareModal when "Delen" is clicked', async () => {
-      render(<HuishoudboekjeCard book={mockBook} isOwner={true} />)
+      render(<HuishoudboekjeCard book={mockBook} isOwner={true} currentUserUid={mockUser.uid} />)
       fireEvent.click(screen.getByRole('button', { name: /delen/i }))
       await waitFor(() => {
         expect(screen.getByText(/delen: testboekje/i)).toBeInTheDocument()

@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import MonthlySummary from '@/components/MonthlySummary'
+import MonthlySummary from '@/components/transactions/MonthlySummary'
 
 // RTL normalizes element text (collapses   to space) but does NOT normalize the query string.
 // So we normalize   in the query helper to get consistent matches.

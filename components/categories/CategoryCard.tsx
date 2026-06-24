@@ -1,6 +1,7 @@
 import Link from 'next/link';
-import { Category } from '@/types';
+import { Category } from '@/types/models';
 import { secondaryButtonClass, dangerButtonClass } from '@/components/ui/buttonStyles';
+import { formatCurrency } from '@/lib/formatUtils';
 
 interface Props {
   category: Category;
@@ -8,10 +9,6 @@ interface Props {
   bookId: string;
   onDelete: (id: string) => void;
   isOwner: boolean;
-}
-
-function fmt(amount: number) {
-  return amount.toLocaleString('nl-NL', { style: 'currency', currency: 'EUR' });
 }
 
 export default function CategoryCard({ category, spent, bookId, onDelete, isOwner }: Props) {
@@ -58,8 +55,8 @@ export default function CategoryCard({ category, spent, bookId, onDelete, isOwne
 
       <div>
         <div className="flex justify-between text-sm mb-1">
-          <span className="text-gray-600">{fmt(spent)} uitgegeven</span>
-          <span className="text-gray-400">max {fmt(category.maxBudget)}</span>
+          <span className="text-gray-600">{formatCurrency(spent)} uitgegeven</span>
+          <span className="text-gray-400">max {formatCurrency(category.maxBudget)}</span>
         </div>
         <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
           <div

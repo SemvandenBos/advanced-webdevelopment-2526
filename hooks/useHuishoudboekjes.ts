@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -6,7 +6,7 @@ import {
   subscribeHuishoudboekjes,
   subscribeArchivedHuishoudboekjes,
 } from '@/lib/firestore/huishoudboekjes';
-import { Huishoudboekje } from '@/types';
+import { Huishoudboekje } from '@/types/models';
 
 export function useHuishoudboekjes() {
   const { user } = useAuth();

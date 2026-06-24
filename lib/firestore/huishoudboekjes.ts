@@ -1,4 +1,4 @@
-import {
+﻿import {
   collection,
   doc,
   getDoc,
@@ -15,7 +15,7 @@ import {
   type Unsubscribe,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { Huishoudboekje } from '@/types';
+import { Huishoudboekje } from '@/types/models';
 
 export function subscribeHuishoudboekjes(
   userId: string,

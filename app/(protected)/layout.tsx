@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import Navbar from '@/components/Navbar';
+import Navbar from '@/components/layout/Navbar';
 import { AppShellSkeleton } from '@/components/skeletons/AppShellSkeleton';
 
 export default function ProtectedLayout({ children }: { children: React.ReactNode }) {

@@ -19,7 +19,7 @@ jest.mock('@/lib/firestore/huishoudboekjes', () => ({
 jest.mock('@/lib/firestore/categories', () => ({
   createCategory: jest.fn().mockResolvedValue(undefined),
 }))
-jest.mock('@/components/CategoryForm', () => ({
+jest.mock('@/components/categories/CategoryForm', () => ({
   __esModule: true,
   default: ({ onSubmit }: { onSubmit: (data: object) => void }) => (
     <button onClick={() => onSubmit({ name: 'Boodschappen', maxBudget: 300 })}>

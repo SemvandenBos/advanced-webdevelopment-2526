@@ -13,7 +13,7 @@ jest.mock('@/lib/firestore/huishoudboekjes', () => ({
   restoreHuishoudboekje: jest.fn(),
   deleteHuishoudboekje: jest.fn(),
 }))
-jest.mock('@/components/HuishoudboekjeCard', () => ({
+jest.mock('@/components/books/HuishoudboekjeCard', () => ({
   __esModule: true,
   default: ({ book }: { book: { name: string } }) => (
     <div data-testid="book-card">{book.name}</div>

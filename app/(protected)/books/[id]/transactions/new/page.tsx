@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import TransactionForm from '@/components/TransactionForm';
+import TransactionForm from '@/components/transactions/TransactionForm';
 import { createTransaction } from '@/lib/firestore/transactions';
 import { useCategories } from '@/hooks/useCategories';
 import { getHuishoudboekje } from '@/lib/firestore/huishoudboekjes';

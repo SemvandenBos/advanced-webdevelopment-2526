@@ -1,8 +1,8 @@
 'use client';
 
 import { Fragment } from 'react';
-import { Transaction } from '@/types';
-import TransactionRow from '@/components/TransactionRow';
+import { Transaction } from '@/types/models';
+import TransactionRow from '@/components/transactions/TransactionRow';
 import { TransactionListSkeleton } from '@/components/skeletons/TransactionSkeleton';
 
 interface Props {

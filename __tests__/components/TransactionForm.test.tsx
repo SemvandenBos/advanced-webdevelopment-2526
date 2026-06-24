@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import TransactionForm from '@/components/TransactionForm'
+import TransactionForm from '@/components/transactions/TransactionForm'
 import { mockCategory, mockCategory2 } from '../fixtures'
 
 jest.mock('next/navigation', () => ({

@@ -4,11 +4,11 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import CategoryForm from '@/components/CategoryForm';
+import CategoryForm from '@/components/categories/CategoryForm';
 import { getCategory, updateCategory } from '@/lib/firestore/categories';
 import { getHuishoudboekje } from '@/lib/firestore/huishoudboekjes';
 import { secondaryButtonClass } from '@/components/ui/buttonStyles';
-import { Category } from '@/types';
+import { Category } from '@/types/models';
 
 function toDateInput(cat: Category): string {
   if (!cat.endDate) return '';

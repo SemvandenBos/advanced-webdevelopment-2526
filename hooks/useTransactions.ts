@@ -1,8 +1,8 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { subscribeTransactions, subscribeAllTransactions } from '@/lib/firestore/transactions';
-import { Transaction } from '@/types';
+import { Transaction } from '@/types/models';
 
 export function useTransactions(bookId: string, year: number, month: number) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -56,7 +56,7 @@ export function useInfiniteTransactions(bookId: string) {
   }, [months.length]);
 
   useEffect(() => {
-    return () => { unsubscribersRef.current.forEach(u => u()); };
+    return () => { unsubscribersRef.current.forEach(unsub => unsub()); };
   }, []);
 
   const transactions = useMemo(

@@ -1,4 +1,6 @@
-// Usage: node scripts/seed.mjs <ownerUid>
+// Usage: node scripts/seed.mjs <ownerUid> <sharerUid>
+//   ownerUid  — the seed user (gets the main book + the archived book)
+//   sharerUid — a second user who owns a shared book and adds ownerUid as member
 // Requires: serviceAccountKey.json in project root (Firebase Console → Project Settings → Service Accounts)
 
 import { initializeApp, cert } from 'firebase-admin/app';
@@ -9,16 +11,20 @@ const serviceAccount = JSON.parse(readFileSync('./serviceAccountKey.json', 'utf8
 initializeApp({ credential: cert(serviceAccount) });
 const db = getFirestore();
 
-const OWNER_UID = process.argv[2];
-if (!OWNER_UID) {
-  console.error('Usage: node scripts/seed.mjs <ownerUid>');
-  console.error('Find your UID in Firebase Console → Authentication → Users');
+const OWNER_UID  = process.argv[2];
+const SHARER_UID = process.argv[3];
+if (!OWNER_UID || !SHARER_UID) {
+  console.error('Usage: node scripts/seed.mjs <ownerUid> <sharerUid>');
+  console.error('Find UIDs in Firebase Console → Authentication → Users');
   process.exit(1);
 }
 
 const d = (dateStr) => Timestamp.fromDate(new Date(dateStr));
 
-// --- Categories ---
+// ─────────────────────────────────────────────────────────────
+// BOOK 1 — Main book (owner = OWNER_UID)
+// ─────────────────────────────────────────────────────────────
+
 // maxBudget is a total cap, not monthly. Chosen to create a spread of states:
 //   Boodschappen:    ~€2380 spent → over budget  (≥100%)
 //   Huur:            ~€6570 spent → comfortably under
@@ -26,7 +32,7 @@ const d = (dateStr) => Timestamp.fromDate(new Date(dateStr));
 //   Transport:       ~€540  spent → just under
 //   Uit eten:        ~€460  spent → over budget  (≥100%)
 //   Abonnementen:    ~€192  spent → comfortably under
-const categories = [
+const categoriesMain = [
   { name: 'Boodschappen',      maxBudget: 2200 },
   { name: 'Huur',              maxBudget: 7500 },
   { name: 'Energie & Water',   maxBudget: 750  },
@@ -35,13 +41,9 @@ const categories = [
   { name: 'Abonnementen',      maxBudget: 250  },
 ];
 
-// cat() returns the index so transactions can reference by name
-const CAT = Object.fromEntries(categories.map((c, i) => [c.name, i]));
+const CAT_MAIN = Object.fromEntries(categoriesMain.map((c, i) => [c.name, i]));
 
-// --- Transactions ---
-// type: 'income' | 'expense'
-// category: key from CAT (or null for uncategorized)
-const transactions = [
+const transactionsMain = [
   // ── January 2026 ──
   { date: '2026-01-01', type: 'expense', amount: 1095.00, description: 'Huur januari',          category: 'Huur' },
   { date: '2026-01-07', type: 'expense', amount: 87.43,   description: 'Albert Heijn',           category: 'Boodschappen' },
@@ -137,33 +139,101 @@ const transactions = [
   { date: '2026-06-28', type: 'expense', amount: 55.70,   description: 'Jumbo',                  category: 'Boodschappen' },
 ];
 
-async function seed() {
+// ─────────────────────────────────────────────────────────────
+// BOOK 2 — Archived book (owner = OWNER_UID, archived = true)
+// A small book for 2025 Q4 that has been closed off.
+// ─────────────────────────────────────────────────────────────
+
+const categoriesArchived = [
+  { name: 'Boodschappen', maxBudget: 600 },
+  { name: 'Huur',         maxBudget: 3300 },
+  { name: 'Transport',    maxBudget: 200 },
+];
+
+const CAT_ARCHIVED = Object.fromEntries(categoriesArchived.map((c, i) => [c.name, i]));
+
+const transactionsArchived = [
+  { date: '2025-10-01', type: 'expense', amount: 1095.00, description: 'Huur oktober',    category: 'Huur' },
+  { date: '2025-10-08', type: 'expense', amount: 65.40,   description: 'Albert Heijn',    category: 'Boodschappen' },
+  { date: '2025-10-12', type: 'expense', amount: 52.80,   description: 'NS maandkaart',   category: 'Transport' },
+  { date: '2025-10-25', type: 'income',  amount: 2650.00, description: 'Salaris oktober', category: null },
+  { date: '2025-11-01', type: 'expense', amount: 1095.00, description: 'Huur november',   category: 'Huur' },
+  { date: '2025-11-06', type: 'expense', amount: 71.20,   description: 'Jumbo',           category: 'Boodschappen' },
+  { date: '2025-11-12', type: 'expense', amount: 52.80,   description: 'NS maandkaart',   category: 'Transport' },
+  { date: '2025-11-25', type: 'income',  amount: 2650.00, description: 'Salaris november',category: null },
+  { date: '2025-12-01', type: 'expense', amount: 1095.00, description: 'Huur december',   category: 'Huur' },
+  { date: '2025-12-10', type: 'expense', amount: 88.90,   description: 'Albert Heijn',    category: 'Boodschappen' },
+  { date: '2025-12-12', type: 'expense', amount: 52.80,   description: 'NS maandkaart',   category: 'Transport' },
+  { date: '2025-12-25', type: 'income',  amount: 2650.00, description: 'Salaris december',category: null },
+];
+
+// ─────────────────────────────────────────────────────────────
+// BOOK 3 — Shared book (owner = SHARER_UID, member = OWNER_UID)
+// A household book owned by someone else, shared with the seed user.
+// ─────────────────────────────────────────────────────────────
+
+const categoriesShared = [
+  { name: 'Boodschappen', maxBudget: 1800 },
+  { name: 'Huur',         maxBudget: 9000 },
+  { name: 'Energie',      maxBudget: 600  },
+  { name: 'Uit eten',     maxBudget: 300  },
+];
+
+const CAT_SHARED = Object.fromEntries(categoriesShared.map((c, i) => [c.name, i]));
+
+const transactionsShared = [
+  // ── April 2026 ──
+  { date: '2026-04-01', type: 'expense', amount: 1450.00, description: 'Huur april',          category: 'Huur' },
+  { date: '2026-04-05', type: 'expense', amount: 112.30,  description: 'Supermarkt',          category: 'Boodschappen' },
+  { date: '2026-04-15', type: 'expense', amount: 98.50,   description: 'Energierekening',     category: 'Energie' },
+  { date: '2026-04-20', type: 'expense', amount: 44.00,   description: 'Italiaans restaurant',category: 'Uit eten' },
+  { date: '2026-04-25', type: 'income',  amount: 3200.00, description: 'Salaris april',       category: null },
+  { date: '2026-04-28', type: 'expense', amount: 95.60,   description: 'Supermarkt',          category: 'Boodschappen' },
+
+  // ── May 2026 ──
+  { date: '2026-05-01', type: 'expense', amount: 1450.00, description: 'Huur mei',            category: 'Huur' },
+  { date: '2026-05-07', type: 'expense', amount: 103.80,  description: 'Supermarkt',          category: 'Boodschappen' },
+  { date: '2026-05-15', type: 'expense', amount: 91.20,   description: 'Energierekening',     category: 'Energie' },
+  { date: '2026-05-18', type: 'expense', amount: 37.50,   description: 'Brunch café',         category: 'Uit eten' },
+  { date: '2026-05-25', type: 'income',  amount: 3200.00, description: 'Salaris mei',         category: null },
+  { date: '2026-05-29', type: 'expense', amount: 88.40,   description: 'Supermarkt',          category: 'Boodschappen' },
+
+  // ── June 2026 ──
+  { date: '2026-06-01', type: 'expense', amount: 1450.00, description: 'Huur juni',           category: 'Huur' },
+  { date: '2026-06-04', type: 'expense', amount: 119.70,  description: 'Supermarkt',          category: 'Boodschappen' },
+  { date: '2026-06-13', type: 'expense', amount: 85.60,   description: 'Energierekening',     category: 'Energie' },
+  { date: '2026-06-21', type: 'expense', amount: 52.00,   description: 'Sushi restaurant',    category: 'Uit eten' },
+  { date: '2026-06-25', type: 'income',  amount: 3200.00, description: 'Salaris juni',        category: null },
+  { date: '2026-06-27', type: 'expense', amount: 76.30,   description: 'Supermarkt',          category: 'Boodschappen' },
+];
+
+// ─────────────────────────────────────────────────────────────
+
+async function seedBook({ name, description, ownerUid, members, archived, categories, CAT, transactions, createdAtStr }) {
   const now = Timestamp.now();
+  const createdAt = createdAtStr ? Timestamp.fromDate(new Date(createdAtStr)) : now;
 
-  // 1. Create huishoudboekje
   const bookRef = await db.collection('huishoudboekjes').add({
-    name: 'Huishoudboekje 2026',
-    description: 'Uitgaven en inkomsten van januari t/m juni 2026',
-    ownerUid: OWNER_UID,
-    members: [],
-    archived: false,
-    createdAt: now,
+    name,
+    description,
+    ownerUid,
+    members,
+    archived,
+    createdAt,
   });
-  console.log(`✓ Boekje aangemaakt: ${bookRef.id}`);
+  console.log(`\n✓ Boekje aangemaakt: "${name}" (${bookRef.id})${archived ? ' [gearchiveerd]' : ''}`);
 
-  // 2. Create categories
   const categoryIds = {};
   for (let i = 0; i < categories.length; i++) {
     const catRef = await bookRef.collection('categories').add({
       name: categories[i].name,
       maxBudget: categories[i].maxBudget,
-      createdAt: now,
+      createdAt,
     });
     categoryIds[i] = catRef.id;
     console.log(`  ✓ Categorie: ${categories[i].name} (max €${categories[i].maxBudget})`);
   }
 
-  // 3. Create transactions
   for (const tx of transactions) {
     const catIdx = tx.category !== null ? CAT[tx.category] : null;
     await bookRef.collection('transactions').add({
@@ -172,18 +242,58 @@ async function seed() {
       date: d(tx.date),
       type: tx.type,
       categoryId: catIdx !== null && catIdx !== undefined ? categoryIds[catIdx] : '',
-      createdBy: OWNER_UID,
-      createdAt: now,
+      createdBy: ownerUid,
+      createdAt,
     });
   }
-  console.log(`✓ ${transactions.length} transacties aangemaakt`);
 
-  const income = transactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
+  const income  = transactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
   const expense = transactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
-  console.log(`\n  Totaal inkomsten: €${income.toFixed(2)}`);
-  console.log(`  Totaal uitgaven:  €${expense.toFixed(2)}`);
-  console.log(`  Saldo:            €${(income - expense).toFixed(2)}`);
-  console.log('\nKlaar! Boekje ID:', bookRef.id);
+  console.log(`  ✓ ${transactions.length} transacties — inkomsten €${income.toFixed(2)}, uitgaven €${expense.toFixed(2)}, saldo €${(income - expense).toFixed(2)}`);
+
+  return bookRef.id;
+}
+
+async function seed() {
+  console.log(`Seed gestart`);
+  console.log(`  ownerUid:  ${OWNER_UID}`);
+  console.log(`  sharerUid: ${SHARER_UID}`);
+
+  await seedBook({
+    name: 'Huishoudboekje 2026',
+    description: 'Uitgaven en inkomsten van januari t/m juni 2026',
+    ownerUid: OWNER_UID,
+    members: [],
+    archived: false,
+    categories: categoriesMain,
+    CAT: CAT_MAIN,
+    transactions: transactionsMain,
+  });
+
+  await seedBook({
+    name: 'Huishoudboekje Q4 2025',
+    description: 'Afgesloten boekje voor oktober – december 2025',
+    ownerUid: OWNER_UID,
+    members: [],
+    archived: true,
+    categories: categoriesArchived,
+    CAT: CAT_ARCHIVED,
+    transactions: transactionsArchived,
+    createdAtStr: '2025-10-01',
+  });
+
+  await seedBook({
+    name: 'Gedeeld huishoudboekje',
+    description: 'Boekje van een huisgenoot, gedeeld met jou',
+    ownerUid: SHARER_UID,
+    members: [OWNER_UID],
+    archived: false,
+    categories: categoriesShared,
+    CAT: CAT_SHARED,
+    transactions: transactionsShared,
+  });
+
+  console.log('\nKlaar!');
 }
 
 seed().catch(err => {
