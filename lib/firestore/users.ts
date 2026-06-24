@@ -1,6 +1,6 @@
 import { doc, setDoc, getDoc, serverTimestamp, collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
-import type { AppUser } from '../../types';
+import type { AppUser } from '@/types/models';
 
 export const createUserDocument = async (
   uid: string,

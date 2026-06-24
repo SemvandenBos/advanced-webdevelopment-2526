@@ -1,4 +1,4 @@
-import {
+﻿import {
   collection,
   doc,
   getDoc,
@@ -13,7 +13,7 @@ import {
   type Unsubscribe,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { Category } from '@/types';
+import { Category } from '@/types/models';
 
 function catCol(bookId: string) {
   return collection(db, 'huishoudboekjes', bookId, 'categories');
