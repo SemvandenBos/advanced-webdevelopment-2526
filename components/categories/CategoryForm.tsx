@@ -4,27 +4,16 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { secondaryButtonClass } from '@/components/ui/buttonStyles';
 import { isPastISODate } from '@/lib/dateUtils';
-
-interface FormValues {
-  name: string;
-  maxBudget: string;
-  endDate: string;
-}
-
-interface SubmitData {
-  name: string;
-  maxBudget: number;
-  endDate?: Date;
-}
+import type { CategoryFormValues, CategorySubmitData } from '@/types/forms';
 
 interface Props {
   initial?: { name?: string; maxBudget?: string; endDate?: string };
-  onSubmit: (data: SubmitData) => Promise<void>;
+  onSubmit: (data: CategorySubmitData) => Promise<void>;
   submitLabel: string;
 }
 
 export default function CategoryForm({ initial, onSubmit, submitLabel }: Props) {
-  const [form, setForm] = useState<FormValues>({
+  const [form, setForm] = useState<CategoryFormValues>({
     name: initial?.name ?? '',
     maxBudget: initial?.maxBudget ?? '',
     endDate: initial?.endDate ?? '',
@@ -33,7 +22,7 @@ export default function CategoryForm({ initial, onSubmit, submitLabel }: Props) 
   const [error, setError] = useState('');
   const router = useRouter();
 
-  const set = (key: keyof FormValues, value: string) =>
+  const set = (key: keyof CategoryFormValues, value: string) =>
     setForm(f => ({ ...f, [key]: value }));
 
   const handleSubmit = async (e: React.FormEvent) => {
