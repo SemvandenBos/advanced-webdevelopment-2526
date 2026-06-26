@@ -9,6 +9,7 @@ import { getCategory, updateCategory } from '@/lib/firestore/categories';
 import { getHuishoudboekje } from '@/lib/firestore/huishoudboekjes';
 import { secondaryButtonClass } from '@/components/ui/buttonStyles';
 import { Category } from '@/types/models';
+import type { CategorySubmitData } from '@/types/forms';
 
 function toDateInput(cat: Category): string {
   if (!cat.endDate) return '';
@@ -36,7 +37,7 @@ export default function EditCategoryPage() {
     });
   }, [id, categoryId]);
 
-  const handleSubmit = async (data: { name: string; maxBudget: number; endDate?: Date }) => {
+  const handleSubmit = async (data: CategorySubmitData) => {
     await updateCategory(id, categoryId, {
       name: data.name,
       maxBudget: data.maxBudget,

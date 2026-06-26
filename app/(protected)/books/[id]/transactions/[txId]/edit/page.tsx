@@ -9,6 +9,7 @@ import { getHuishoudboekje } from '@/lib/firestore/huishoudboekjes';
 import { secondaryButtonClass } from '@/components/ui/buttonStyles';
 import TransactionForm from '@/components/transactions/TransactionForm';
 import { Transaction } from '@/types/models';
+import type { TransactionSubmitData } from '@/types/forms';
 import { useCategories } from '@/hooks/useCategories';
 
 export default function EditTransactionPage() {
@@ -40,13 +41,7 @@ export default function EditTransactionPage() {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   })();
 
-  const handleSubmit = async (data: {
-    amount: number;
-    description: string;
-    date: Date;
-    type: 'income' | 'expense';
-    categoryId: string;
-  }) => {
+  const handleSubmit = async (data: TransactionSubmitData) => {
     await updateTransaction(id, txId, data);
     router.push(`/books/${id}`);
   };

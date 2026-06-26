@@ -8,6 +8,7 @@ import CategoryForm from '@/components/categories/CategoryForm';
 import { createCategory } from '@/lib/firestore/categories';
 import { getHuishoudboekje } from '@/lib/firestore/huishoudboekjes';
 import { secondaryButtonClass } from '@/components/ui/buttonStyles';
+import type { CategorySubmitData } from '@/types/forms';
 
 export default function NewCategoryPage() {
   const { id } = useParams<{ id: string }>();
@@ -20,7 +21,7 @@ export default function NewCategoryPage() {
     });
   }, [id, user?.uid, router]);
 
-  const handleSubmit = async (data: { name: string; maxBudget: number; endDate?: Date }) => {
+  const handleSubmit = async (data: CategorySubmitData) => {
     await createCategory(id, data);
     router.push(`/books/${id}/categories`);
   };

@@ -9,3 +9,11 @@ export interface CategorySubmitData {
   maxBudget: number;
   endDate?: Date;
 }
+
+export interface TransactionSubmitData {
+  amount: number;
+  description: string;
+  date: Date;
+  type: 'income' | 'expense';
+  categoryId: string;
+}

@@ -9,6 +9,7 @@ import { createTransaction } from '@/lib/firestore/transactions';
 import { useCategories } from '@/hooks/useCategories';
 import { getHuishoudboekje } from '@/lib/firestore/huishoudboekjes';
 import { secondaryButtonClass } from '@/components/ui/buttonStyles';
+import type { TransactionSubmitData } from '@/types/forms';
 
 export default function NewTransactionPage() {
   const { id } = useParams<{ id: string }>();
@@ -22,13 +23,7 @@ export default function NewTransactionPage() {
     });
   }, [id, user?.uid, router]);
 
-  const handleSubmit = async (data: {
-    amount: number;
-    description: string;
-    date: Date;
-    type: 'income' | 'expense';
-    categoryId: string;
-  }) => {
+  const handleSubmit = async (data: TransactionSubmitData) => {
     if (!user) return;
     await createTransaction(id, user.uid, data);
     router.push(`/books/${id}`);
